@@ -17,7 +17,7 @@
         
         .glass { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 15px; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 14px; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron', sans-serif; font-size: 14px; transition: 0.2s; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
         .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(7, 255, 255, 0.5); }
         .btn:active { transform: scale(0.95); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -47,10 +47,10 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(3600deg); }
         }
-        .r-wrap::before { content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 15px solid #gold; }
+        .r-wrap::before { content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 15px solid var(--gold); z-index: 2; }
 
         .ttt { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; max-width: 210px; margin: 15px auto; }
-        .c { aspect-ratio: 1; background: #000; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 8px; cursor: pointer; }
+        .c { aspect-ratio: 1; background: #000; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
         .c:hover { border-color: var(--p); transform: scale(1.05); box-shadow: 0 0 10px rgba(7, 255, 255, 0.3); }
 
         nav { position: fixed; bottom: 0; width: 100%; display: grid; grid-template-columns: repeat(6, 1fr); background: #000; border-top: 1px solid #111; padding: 12px 0 25px; z-index: 50; }
@@ -59,7 +59,7 @@
         @keyframes tabPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         .tab span { display: block; font-size: 8px; text-transform: uppercase; margin-top: 4px; }
 
-        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; }
+        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: all 0.3s; text-align: center; }
         .orb:hover { transform: scale(1.08); box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
         .orb.on { border-color: var(--r); animation: miningPulse 1.5s infinite; background: rgba(255, 51, 102, 0.15); }
         @keyframes miningPulse { 0%, 100% { box-shadow: 0 0 10px rgba(255, 51, 102, 0.5); } 50% { box-shadow: 0 0 25px rgba(255, 51, 102, 0.8); } }
@@ -82,7 +82,7 @@
         .btn-group button { flex: 1; padding: 12px; }
 
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .auth-tab { flex: 1; padding: 10px; background: #000; border: 2px solid #333; color: #555; cursor: pointer; text-align: center; border-radius: 8px; text-transform: uppercase; font-size: 11px; font-weight: 900; transition: 0.2s; }
+        .auth-tab { flex: 1; padding: 10px; background: #000; border: 2px solid #333; color: #555; cursor: pointer; text-align: center; border-radius: 8px; text-transform: uppercase; font-size: 11px; font-weight: 900; }
         .auth-tab.active { background: var(--p); color: #000; border-color: var(--p); transform: scale(1.05); }
 
         .chat-container { display: flex; flex-direction: column; height: 100%; }
@@ -109,6 +109,10 @@
         .internet-check { position: fixed; top: 10px; right: 10px; z-index: 999; padding: 10px 15px; border-radius: 20px; font-size: 11px; display: none; animation: slideIn 0.3s ease; }
         .internet-check.no-connection { background: var(--r); display: block; }
         .internet-check.connected { background: var(--g); color: #000; display: block; }
+
+        .sync-indicator { position: fixed; bottom: 80px; right: 10px; width: 12px; height: 12px; border-radius: 50%; background: #666; z-index: 45; animation: pulse 1s infinite; }
+        .sync-indicator.active { background: var(--g); }
+        @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
         .avatar-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
         .avatar-option { width: 60px; height: 60px; border-radius: 50%; cursor: pointer; border: 2px solid #333; transition: all 0.2s; overflow: hidden; }
@@ -142,6 +146,9 @@
 
 <!-- ІНТЕРНЕТ СТАТУС -->
 <div id="internet-status" class="internet-check"></div>
+
+<!-- ІНДИКАТОР СИНХРОНІЗАЦІЇ -->
+<div id="sync-indicator" class="sync-indicator" title="Синхронізація JsonBin"></div>
 
 <!-- ЕКРАН ВХОДУ -->
 <div id="auth-scr" style="height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;">
@@ -294,6 +301,10 @@
                 <div class="stat-label">Статус майнингу</div>
                 <div class="stat-value" id="info-mining">❌ ВИМКНЕНО</div>
             </div>
+            <div class="stat-card">
+                <div class="stat-label">Синх. JsonBin</div>
+                <div class="stat-value" id="info-sync">🔄 АКТИВНА</div>
+            </div>
         </div>
 
         <div class="glass">
@@ -326,6 +337,8 @@
         </div>
     </div>
 </div>
+
+<script src="realtime-jsonbin-sync.js"></script>
 
 <script>
     const JSONBIN_ID = '6a04f5aaadc21f119a979f14';
@@ -417,12 +430,23 @@
             });
             if (response.ok) {
                 localStorage.setItem('stick_users', JSON.stringify(allUsers));
+                updateSyncIndicator(true);
                 return true;
             }
         } catch (error) {
             console.warn('⚠ Збереження на JSONBin не вдалося:', error);
             localStorage.setItem('stick_users', JSON.stringify(allUsers));
+            updateSyncIndicator(false);
             return false;
+        }
+    }
+
+    // ===== ІНДИКАТОР СИНХРОНІЗАЦІЇ =====
+    function updateSyncIndicator(isSynced) {
+        const indicator = document.getElementById('sync-indicator');
+        if (isSynced) {
+            indicator.classList.add('active');
+            setTimeout(() => indicator.classList.remove('active'), 500);
         }
     }
 
@@ -516,6 +540,12 @@
         startDataRefresh();
         setupTicTacToe();
         
+        // 🔄 ЗАПУСТИТИ РЕАЛЬНУ СИНХРОНІЗАЦІЮ
+        if (typeof initRealtimeJsonBinSync === 'function') {
+            initRealtimeJsonBinSync();
+            console.log('✅ Варіант 2: Реальна синхронізація JsonBin активована!');
+        }
+        
         if (gameState.mining) {
             const btn = document.getElementById('mbtn');
             btn.classList.add('on');
@@ -528,6 +558,7 @@
         document.getElementById('h-u').textContent = gameState.user || '---';
         document.getElementById('h-b').textContent = gameState.balance.toFixed(4);
         document.getElementById('v-bal').textContent = gameState.balance.toFixed(4);
+        triggerRealtimeSync('header');
     }
 
     function updateAccountInfo() {
@@ -613,6 +644,7 @@
         saveUserData();
         saveAllUsersToJsonBin();
         updateAccountInfo();
+        triggerRealtimeSync('mining');
     }
 
     // ===== АВАТАР МОДАЛЬ =====
@@ -633,6 +665,7 @@
         document.querySelectorAll('.avatar-option').forEach(opt => opt.classList.remove('selected'));
         event.target.classList.add('selected');
         saveAllUsersToJsonBin();
+        triggerRealtimeSync('avatar');
     }
 
     function uploadAvatarFile() {
@@ -678,6 +711,7 @@
         allUsers[gameState.user].password = newPass;
         gameState.password = newPass;
         saveAllUsersToJsonBin();
+        triggerRealtimeSync('password');
         alert('✓ Пароль успішно змінено!');
         document.getElementById('new-password').value = '';
         document.getElementById('confirm-password').value = '';
@@ -764,6 +798,7 @@
 
         saveUserData();
         saveAllUsersToJsonBin();
+        triggerRealtimeSync('transfer');
 
         alert(`✓ Успішно відправлено ${amount.toFixed(4)} STICK користувачу ${recipient}!`);
         document.getElementById('transfer-user').value = '';
@@ -837,6 +872,7 @@
 
         allUsers[friendName].friendRequests.push(gameState.user);
         saveAllUsersToJsonBin();
+        triggerRealtimeSync('friend-request');
 
         alert(`✓ Запит на дружбу відправлено користувачу ${friendName}!`);
         document.getElementById('f-u').value = '';
@@ -882,6 +918,7 @@
 
         saveUserData();
         saveAllUsersToJsonBin();
+        triggerRealtimeSync('friend-accept');
 
         updateFriendsList();
         updateFriendRequestsList();
@@ -893,6 +930,7 @@
         gameState.friendRequests.splice(idx, 1);
         saveUserData();
         saveAllUsersToJsonBin();
+        triggerRealtimeSync('friend-reject');
         updateFriendRequestsList();
     }
 
@@ -940,6 +978,7 @@
 
         saveUserData();
         saveAllUsersToJsonBin();
+        triggerRealtimeSync('friend-remove');
         updateFriendsList();
         updateAccountInfo();
     }
@@ -980,6 +1019,12 @@
         chatDiv.scrollTop = chatDiv.scrollHeight;
     }
 
+    function handlePrivateChatKeypress(event) {
+        if (event.key === 'Enter') {
+            sendPrivateMsg();
+        }
+    }
+
     function sendPrivateMsg() {
         const input = document.getElementById('private-msg-in');
         const msg = input.value.trim();
@@ -1002,37 +1047,82 @@
         }
 
         allUsers[gameState.currentChatFriend].privateChatMessages[gameState.user].push(message);
-        
+
         saveUserData();
         saveAllUsersToJsonBin();
+        triggerRealtimeSync('message');
+
         displayPrivateChat();
         input.value = '';
     }
 
-    function handlePrivateChatKeypress(event) {
-        if (event.key === 'Enter') {
-            sendPrivateMsg();
+    // ===== РУЛЕТКА КАЗИНО =====
+    let wheelSpinning = false;
+
+    async function spin(choice) {
+        if (wheelSpinning) return;
+
+        const amount = parseFloat(document.getElementById('bet-amt').value);
+
+        if (!amount || amount <= 0) {
+            alert('Введіть ставку!');
+            return;
         }
+        if (amount > gameState.balance) {
+            alert('Недостатньо коштів!');
+            return;
+        }
+
+        wheelSpinning = true;
+        const wheel = document.getElementById('wheel');
+        const outcomes = {
+            'red': { rotation: 70, multiplier: 3 },
+            'black': { rotation: 180, multiplier: 5 },
+            'green': { rotation: 270, multiplier: 2 }
+        };
+
+        const outcome = outcomes[choice];
+        wheel.classList.add('spin');
+        wheel.style.transform = `rotate(${outcome.rotation}deg)`;
+
+        await new Promise(resolve => setTimeout(resolve, 5000));
+
+        gameState.balance += amount * outcome.multiplier;
+        document.getElementById('bet-amt').value = '';
+        updateHeader();
+        updateAccountInfo();
+        alert(`🎉 Ви виграли ${(amount * outcome.multiplier).toFixed(4)} STICK!`);
+
+        saveUserData();
+        saveAllUsersToJsonBin();
+        triggerRealtimeSync('casino');
+
+        wheel.classList.remove('spin');
+        wheelSpinning = false;
     }
 
     // ===== TIC-TAC-TOE =====
     function setupTicTacToe() {
-        document.querySelectorAll('.ttt .c').forEach(cell => {
-            cell.addEventListener('click', function() {
-                const idx = this.dataset.idx;
-                if (gameState.tttBoard[idx] === '') {
-                    gameState.tttBoard[idx] = gameState.tttCurrentPlayer;
-                    this.textContent = gameState.tttCurrentPlayer;
-                    
-                    if (checkTicTacToeWinner()) {
-                        alert(`${gameState.tttCurrentPlayer} переміг!`);
-                        resetTicTacToe();
-                    } else {
-                        gameState.tttCurrentPlayer = gameState.tttCurrentPlayer === 'X' ? 'O' : 'X';
-                    }
-                }
-            });
+        document.querySelectorAll('.c').forEach((cell, idx) => {
+            cell.textContent = gameState.tttBoard[idx];
+            cell.onclick = () => playTicTacToe(idx);
         });
+    }
+
+    function playTicTacToe(idx) {
+        if (gameState.tttBoard[idx] !== '') return;
+
+        gameState.tttBoard[idx] = gameState.tttCurrentPlayer;
+        document.querySelectorAll('.c')[idx].textContent = gameState.tttCurrentPlayer;
+
+        const winner = checkTicTacToeWinner();
+        if (winner) {
+            alert(`🎉 ${winner} переміг!`);
+            resetTicTacToe();
+            return;
+        }
+
+        gameState.tttCurrentPlayer = gameState.tttCurrentPlayer === 'X' ? 'O' : 'X';
     }
 
     function checkTicTacToeWinner() {
@@ -1042,92 +1132,74 @@
             [0, 3, 6], [1, 4, 7], [2, 5, 8],
             [0, 4, 8], [2, 4, 6]
         ];
-        
+
         for (let line of lines) {
-            if (board[line[0]] && board[line[0]] === board[line[1]] && board[line[1]] === board[line[2]]) {
-                return true;
+            if (board[line[0]] && board[line[0]] === board[line[1]] && board[line[0]] === board[line[2]]) {
+                return board[line[0]];
             }
         }
-        return false;
+
+        if (board.every(cell => cell !== '')) {
+            return 'НІЧИЯ';
+        }
+
+        return null;
     }
 
     function resetTicTacToe() {
         gameState.tttBoard = ['', '', '', '', '', '', '', '', ''];
         gameState.tttCurrentPlayer = 'X';
-        document.querySelectorAll('.ttt .c').forEach(cell => cell.textContent = '');
+        setupTicTacToe();
     }
 
     function challengeFriend() {
         const friend = document.getElementById('ttt-friend').value;
-        const bet = parseFloat(document.getElementById('ttt-bet').value) || 0;
-        
+        const bet = parseFloat(document.getElementById('ttt-bet').value);
+
         if (friend === 'Оберіть друга...') {
             alert('Оберіть друга!');
             return;
         }
-        
-        if (bet > 0 && bet > gameState.balance) {
-            alert('Недостатньо коштів!');
-            return;
-        }
-        
-        alert(`✓ Виклик надіслано ${friend}! (Ставка: ${bet.toFixed(4)} STICK)`);
-        document.getElementById('ttt-friend').value = 'Оберіть друга...';
-        document.getElementById('ttt-bet').value = '0';
-    }
-
-    function spin(color) {
-        const bet = parseFloat(document.getElementById('bet-amt').value);
-        
-        if (!bet || bet <= 0) {
-            alert('Введіть ставку!');
+        if (bet < 0) {
+            alert('Некоректна ставка!');
             return;
         }
         if (bet > gameState.balance) {
             alert('Недостатньо коштів!');
             return;
         }
-        
-        const wheel = document.getElementById('wheel');
-        wheel.classList.remove('spin');
-        void wheel.offsetWidth;
-        wheel.classList.add('spin');
-        
-        setTimeout(() => {
-            const result = ['red', 'black', 'green'][Math.floor(Math.random() * 3)];
-            const multipliers = { red: 3, black: 5, green: 2 };
-            
-            if (result === color) {
-                gameState.balance += bet * multipliers[color];
-                alert(`🎉 Ви перемогли! +${(bet * multipliers[color]).toFixed(4)} STICK`);
-            } else {
-                gameState.balance -= bet;
-                alert(`😢 Ви програли -${bet.toFixed(4)} STICK`);
-            }
-            
-            updateHeader();
-            updateAccountInfo();
-            saveUserData();
-            saveAllUsersToJsonBin();
-        }, 5000);
+
+        alert(`Виклик відправлено ${friend}!`);
+        resetTicTacToe();
     }
 
+    // ===== ВИХІД =====
     function logout() {
-        if (confirm('Ви впевнені?')) {
-            gameState.user = null;
-            clearInterval(autoSaveInterval);
-            clearInterval(refreshInterval);
-            clearInterval(mineInterval);
-            
-            document.getElementById('main-scr').style.display = 'none';
-            document.getElementById('auth-scr').style.display = 'flex';
-            document.getElementById('login-u').value = '';
-            document.getElementById('login-p').value = '';
-        }
+        saveUserData();
+        saveAllUsersToJsonBin();
+        
+        gameState = {
+            user: null, password: null, balance: 0, mining: false, 
+            friends: [], friendRequests: [], privateChatMessages: {},
+            tttCurrentPlayer: 'X', tttBoard: ['', '', '', '', '', '', '', '', ''],
+            currentChatFriend: null, miningStartTime: 0, lastMiningAmount: 0
+        };
+
+        if (autoSaveInterval) clearInterval(autoSaveInterval);
+        if (refreshInterval) clearInterval(refreshInterval);
+        if (mineInterval) clearInterval(mineInterval);
+
+        document.getElementById('main-scr').style.display = 'none';
+        document.getElementById('auth-scr').style.display = 'flex';
+        document.getElementById('login-u').value = '';
+        document.getElementById('login-p').value = '';
     }
 
-    // ІНІЦІАЛІЗАЦІЯ
-    window.addEventListener('load', loadAllUsers);
+    // Ініціалізація при завантаженні
+    window.addEventListener('load', () => {
+        loadAllUsers();
+        console.log('🎮 STICK FARM ініціалізовано');
+    });
 </script>
 
 </body>
