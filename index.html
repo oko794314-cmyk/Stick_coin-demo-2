@@ -17,7 +17,7 @@
         
         .glass { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 15px; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 14px; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron', sans-serif; transition: all 0.3s ease; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron', sans-serif; font-size: 14px; transition: 0.2s; }
         .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(7, 255, 255, 0.5); }
         .btn:active { transform: scale(0.95); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -47,10 +47,10 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(3600deg); }
         }
-        .r-wrap::before { content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 18px solid var(--gold); z-index: 10; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.8)); }
+        .r-wrap::before { content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 15px solid #gold; }
 
         .ttt { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; max-width: 210px; margin: 15px auto; }
-        .c { aspect-ratio: 1; background: #000; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+        .c { aspect-ratio: 1; background: #000; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 8px; cursor: pointer; }
         .c:hover { border-color: var(--p); transform: scale(1.05); box-shadow: 0 0 10px rgba(7, 255, 255, 0.3); }
 
         nav { position: fixed; bottom: 0; width: 100%; display: grid; grid-template-columns: repeat(6, 1fr); background: #000; border-top: 1px solid #111; padding: 12px 0 25px; z-index: 50; }
@@ -59,7 +59,7 @@
         @keyframes tabPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         .tab span { display: block; font-size: 8px; text-transform: uppercase; margin-top: 4px; }
 
-        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: all 0.3s; }
+        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; }
         .orb:hover { transform: scale(1.08); box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
         .orb.on { border-color: var(--r); animation: miningPulse 1.5s infinite; background: rgba(255, 51, 102, 0.15); }
         @keyframes miningPulse { 0%, 100% { box-shadow: 0 0 10px rgba(255, 51, 102, 0.5); } 50% { box-shadow: 0 0 25px rgba(255, 51, 102, 0.8); } }
@@ -82,7 +82,7 @@
         .btn-group button { flex: 1; padding: 12px; }
 
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .auth-tab { flex: 1; padding: 10px; background: #000; border: 2px solid #333; color: #555; cursor: pointer; text-align: center; border-radius: 8px; text-transform: uppercase; font-size: 11px; transition: all 0.3s; }
+        .auth-tab { flex: 1; padding: 10px; background: #000; border: 2px solid #333; color: #555; cursor: pointer; text-align: center; border-radius: 8px; text-transform: uppercase; font-size: 11px; font-weight: 900; transition: 0.2s; }
         .auth-tab.active { background: var(--p); color: #000; border-color: var(--p); transform: scale(1.05); }
 
         .chat-container { display: flex; flex-direction: column; height: 100%; }
@@ -156,14 +156,14 @@
         <div id="login-form" class="auth-form active">
             <input type="text" id="login-u" placeholder="ЛОГІН">
             <input type="password" id="login-p" placeholder="ПАРОЛЬ">
-            <button class="btn" onclick="auth()">УВІЙТИ</button>
+            <button class="btn" type="button" onclick="auth()">УВІЙТИ</button>
         </div>
 
         <div id="register-form" class="auth-form" style="display:none;">
             <input type="text" id="reg-u" placeholder="ЛОГІН">
             <input type="password" id="reg-p" placeholder="ПАРОЛЬ">
             <input type="password" id="reg-p2" placeholder="ПОВТОРИТИ ПАРОЛЬ">
-            <button class="btn" onclick="register()">СТВОРИТИ АКАУНТ</button>
+            <button class="btn" type="button" onclick="register()">СТВОРИТИ АКАУНТ</button>
         </div>
     </div>
 </div>
@@ -194,7 +194,7 @@
             
             <label style="font-size:10px; color:var(--p); margin-top:15px;">СУМА</label>
             <input type="number" id="transfer-amount" placeholder="0.0000" min="0.0001" step="0.0001">
-            <button class="btn" onclick="transferCoins()" style="margin-top:15px;">ВІДПРАВИТИ</button>
+            <button class="btn" type="button" onclick="transferCoins()" style="margin-top:15px;">ВІДПРАВИТИ</button>
         </div>
     </div>
 
@@ -206,9 +206,9 @@
             <div class="r-wrap"><div id="wheel" class="r-box"></div></div>
             <input type="number" id="bet-amt" placeholder="СТАВКА" min="0.0001" step="0.0001">
             <div class="casino-buttons">
-                <button class="btn" style="background:#1a1a1a; border:2px solid #ff3366; color:#ff3366;" onclick="spin('red')">🔴 RED (x3)</button>
-                <button class="btn" style="background:#1a1a1a; border:2px solid #1a1a1a; color:#fff;" onclick="spin('black')">⚫ BLACK (x5)</button>
-                <button class="btn" style="background:#1a1a1a; border:2px solid #00ff88; color:#00ff88;" onclick="spin('green')">🟢 GREEN (x2)</button>
+                <button class="btn" type="button" style="background:#1a1a1a; border:2px solid #ff3366; color:#ff3366;" onclick="spin('red')">🔴 RED (x3)</button>
+                <button class="btn" type="button" style="background:#1a1a1a; border:2px solid #1a1a1a; color:#fff;" onclick="spin('black')">⚫ BLACK (x5)</button>
+                <button class="btn" type="button" style="background:#1a1a1a; border:2px solid #00ff88; color:#00ff88;" onclick="spin('green')">🟢 GREEN (x2)</button>
             </div>
         </div>
         <h3>TIC-TAC-TOE НА СТАВКУ</h3>
@@ -216,13 +216,13 @@
             <label style="font-size:10px; color:var(--p);">ОБЕРІТЬ ДРУГА</label>
             <select id="ttt-friend" style="margin-top: 8px;"><option>Оберіть друга...</option></select>
             <input type="number" id="ttt-bet" placeholder="СТАВКА на МОНЕТИ (0 = просто гра)" min="0" step="0.0001" style="margin-top: 8px;">
-            <button class="btn" onclick="challengeFriend()" style="margin-top:10px;">ВИКЛИКАТИ НА ГРУ</button>
+            <button class="btn" type="button" onclick="challengeFriend()" style="margin-top:10px;">ВИКЛИКАТИ НА ГРУ</button>
             <div class="ttt" id="ttt-board">
                 <div class="c" data-idx="0"></div><div class="c" data-idx="1"></div><div class="c" data-idx="2"></div>
                 <div class="c" data-idx="3"></div><div class="c" data-idx="4"></div><div class="c" data-idx="5"></div>
                 <div class="c" data-idx="6"></div><div class="c" data-idx="7"></div><div class="c" data-idx="8"></div>
             </div>
-            <button class="btn" onclick="resetTicTacToe()" style="margin-top:10px; font-size:12px;">ОЧИСТИТИ</button>
+            <button class="btn" type="button" onclick="resetTicTacToe()" style="margin-top:10px; font-size:12px;">ОЧИСТИТИ</button>
         </div>
     </div>
 
@@ -231,7 +231,7 @@
         <h3 style="margin-top:0;">👥 ДРУЗІ</h3>
         <div style="display:flex; gap:8px;">
             <input type="text" id="f-u" placeholder="Логін..." onkeyup="searchFriendUser()">
-            <button class="btn" style="width:80px; padding:12px;" onclick="sendFriendRequest()">ADD</button>
+            <button class="btn" type="button" style="width:80px; padding:12px;" onclick="sendFriendRequest()">ADD</button>
         </div>
         <div id="friend-search-results" class="user-search-results" style="display:none; margin-top:10px;"></div>
 
@@ -255,7 +255,7 @@
             <div class="chat-messages" id="private-chat-messages"></div>
             <div class="chat-input-wrapper">
                 <input type="text" id="private-msg-in" placeholder="Повідомлення..." onkeypress="handlePrivateChatKeypress(event)">
-                <button class="btn" onclick="sendPrivateMsg()">></button>
+                <button class="btn" type="button" onclick="sendPrivateMsg()">></button>
             </div>
         </div>
     </div>
@@ -273,7 +273,7 @@
             <label style="font-size:10px; color:var(--p); margin-top:15px;">НОВИЙ ПАРОЛЬ</label>
             <input type="password" id="new-password" placeholder="Новий пароль">
             <input type="password" id="confirm-password" placeholder="Повторіть пароль" style="margin-top:8px;">
-            <button class="btn" onclick="changePassword()" style="margin-top:10px; background:#ffaa00; color:#000;">ЗМІНИТИ ПАРОЛЬ</button>
+            <button class="btn" type="button" onclick="changePassword()" style="margin-top:10px; background:#ffaa00; color:#000;">ЗМІНИТИ ПАРОЛЬ</button>
         </div>
 
         <div class="glass">
@@ -297,7 +297,7 @@
         </div>
 
         <div class="glass">
-            <button class="btn" onclick="logout()" style="background:var(--r); color:#fff;">ВИХІД</button>
+            <button class="btn" type="button" onclick="logout()" style="background:var(--r); color:#fff;">ВИХІД</button>
         </div>
     </div>
 
@@ -317,12 +317,12 @@
         <h2 style="text-align:center;">ОБЕРІТЬ АВАТАР</h2>
         <div class="avatar-gallery" id="avatar-gallery"></div>
         <div style="margin-top:15px;">
-            <label style="font-size:10px; color:var(--p);">ЛИ ЗАВАНТАЖИТИ ФАЙЛ</label>
+            <label style="font-size:10px; color:var(--p);">ЗАВАНТАЖИТИ ФАЙЛ</label>
             <input type="file" id="avatar-file" accept="image/*" style="margin-top:5px;">
         </div>
         <div style="display:flex; gap:10px; margin-top:15px;">
-            <button class="btn" onclick="closeAvatarModal()" style="background:#666;">НАЗАД</button>
-            <button class="btn" onclick="uploadAvatarFile()">ЗАВАНТАЖИТИ</button>
+            <button class="btn" type="button" onclick="closeAvatarModal()" style="background:#666;">НАЗАД</button>
+            <button class="btn" type="button" onclick="uploadAvatarFile()">ЗАВАНТАЖИТИ</button>
         </div>
     </div>
 </div>
@@ -340,7 +340,7 @@
         'https://api.dicebear.com/7.x/avataaars/svg?seed=user4',
         'https://api.dicebear.com/7.x/avataaars/svg?seed=user5',
         'https://api.dicebear.com/7.x/avataaars/svg?seed=user6',
-        'https://api.dicebear.com/7.x/avataaars/svg?seed=pixel1',
+        'https://api.dicebear.com/7.x/pixel1/svg?seed=pixel1',
         'https://api.dicebear.com/7.x/pixelart/svg?seed=user1',
         'https://api.dicebear.com/7.x/bottts/svg?seed=user1',
     ];
@@ -473,13 +473,6 @@
     }
 
     async function auth() {
-        // ПЕРЕВІРКА ІНТЕРНЕТУ
-        if (!navigator.onLine) {
-            alert('❌ НЕМ ЗЄДНАННЯ З ІНТЕРНЕТОМ\n\nБудь ласка, перевірте своє з'єднання з інтернетом і спробуйте ще раз.');
-            checkInternet();
-            return;
-        }
-
         const username = document.getElementById('login-u').value.trim();
         const password = document.getElementById('login-p').value;
 
@@ -487,6 +480,9 @@
             alert('Заповніть всі поля!');
             return;
         }
+        
+        await loadAllUsers();
+        
         if (!allUsers[username]) {
             alert('Користувача не існує!');
             return;
@@ -539,6 +535,17 @@
         document.getElementById('info-balance').textContent = gameState.balance.toFixed(4);
         document.getElementById('info-friends').textContent = gameState.friends.length;
         document.getElementById('info-mining').textContent = gameState.mining ? '✅ АКТИВНИЙ' : '❌ ВИМКНЕНО';
+    }
+
+    function saveUserData() {
+        if (gameState.user && allUsers[gameState.user]) {
+            allUsers[gameState.user].balance = gameState.balance;
+            allUsers[gameState.user].mining = gameState.mining;
+            allUsers[gameState.user].miningStartTime = gameState.miningStartTime;
+            allUsers[gameState.user].friends = gameState.friends;
+            allUsers[gameState.user].friendRequests = gameState.friendRequests;
+            allUsers[gameState.user].privateChatMessages = gameState.privateChatMessages;
+        }
     }
 
     function startAutoSave() {
@@ -615,7 +622,7 @@
         gallery.innerHTML = avatarGallery.map(avatar => `
             <img class="avatar-option ${avatar === allUsers[gameState.user]?.avatar ? 'selected' : ''}" 
                  src="${avatar}" 
-                 onclick="selectAvatar('${avatar}')">
+                 onclick="selectAvatar('${avatar}')" alt="avatar">
         `).join('');
         modal.classList.add('active');
     }
@@ -852,8 +859,8 @@
                     <img src="${allUsers[friend].avatar}" alt="avatar" class="friend-item-avatar">
                     <span style="font-size:12px;">${friend}</span>
                 </div>
-                <button class="btn" onclick="acceptFriendRequest(${idx})" style="width:50px; background:var(--g); color:#000; font-size:10px; padding:6px;">✓</button>
-                <button class="btn" onclick="rejectFriendRequest(${idx})" style="width:50px; background:var(--r); color:#fff; font-size:10px; padding:6px; margin-left:5px;">✕</button>
+                <button class="btn" type="button" onclick="acceptFriendRequest(${idx})" style="width:50px; background:var(--g); color:#000; font-size:10px; padding:6px;">✓</button>
+                <button class="btn" type="button" onclick="rejectFriendRequest(${idx})" style="width:50px; background:var(--r); color:#fff; font-size:10px; padding:6px; margin-left:5px;">✕</button>
             `;
             requestsDiv.appendChild(div);
         });
@@ -909,7 +916,7 @@
                     <img src="${allUsers[friend].avatar}" alt="avatar" class="friend-item-avatar">
                     <span style="font-size:12px;">${friend}</span>
                 </div>
-                <button class="btn" onclick="removeFriend(${idx})" style="width:50px; background:var(--r); padding:6px; font-size:10px;">✕</button>
+                <button class="btn" type="button" onclick="removeFriend(${idx})" style="width:50px; background:var(--r); padding:6px; font-size:10px;">✕</button>
             `;
             listDiv.appendChild(div);
             
@@ -998,9 +1005,8 @@
         
         saveUserData();
         saveAllUsersToJsonBin();
-
-        input.value = '';
         displayPrivateChat();
+        input.value = '';
     }
 
     function handlePrivateChatKeypress(event) {
@@ -1009,104 +1015,36 @@
         }
     }
 
-    // ===== РУЛЕТКА РЕАЛІСТИЧНА =====
-    function spin(color) {
-        const betAmount = parseFloat(document.getElementById('bet-amt').value);
-        
-        if (!betAmount || betAmount <= 0) {
-            alert('Введіть ставку!');
-            return;
-        }
-        
-        if (betAmount > gameState.balance) {
-            alert('Недостатньо коштів!');
-            return;
-        }
-
-        gameState.balance -= betAmount;
-        const wheel = document.getElementById('wheel');
-        wheel.classList.remove('spin');
-        
-        const rand = Math.random() * 100;
-        let winColor;
-        if (rand < 48) winColor = 'red';
-        else if (rand < 72) winColor = 'black';
-        else winColor = 'green';
-
-        let rotation = 0;
-        if (winColor === 'red') {
-            rotation = 360 * 10 + Math.random() * 48;
-        } else if (winColor === 'black') {
-            rotation = 360 * 10 + 100 + Math.random() * 42;
-        } else {
-            rotation = 360 * 10 + 220 + Math.random() * 40;
-        }
-
-        setTimeout(() => {
-            wheel.classList.add('spin');
-            wheel.style.transform = `rotate(${rotation}deg)`;
-        }, 100);
-
-        setTimeout(() => {
-            if (winColor === color) {
-                const multipliers = {
-                    'green': 2,
-                    'red': 3,
-                    'black': 5
-                };
-                const multiplier = multipliers[color];
-                const winAmount = betAmount * multiplier;
-                gameState.balance += winAmount;
-                alert(`🎉 ВИ ВИГРАЛИ ${winAmount.toFixed(4)} STICK!\n(${winColor.toUpperCase()} x${multiplier})`);
-            } else {
-                alert(`❌ Ви програли ${betAmount.toFixed(4)} STICK\n(Випало: ${winColor.toUpperCase()})`);
-            }
-            
-            updateHeader();
-            updateAccountInfo();
-            saveUserData();
-            saveAllUsersToJsonBin();
-            document.getElementById('bet-amt').value = '';
-        }, 5000);
-    }
-
-    // ===== TIC TAC TOE =====
+    // ===== TIC-TAC-TOE =====
     function setupTicTacToe() {
-        const cells = document.querySelectorAll('.ttt .c');
-        cells.forEach(cell => {
-            cell.removeEventListener('click', tttClickHandler);
-            cell.addEventListener('click', tttClickHandler);
+        document.querySelectorAll('.ttt .c').forEach(cell => {
+            cell.addEventListener('click', function() {
+                const idx = this.dataset.idx;
+                if (gameState.tttBoard[idx] === '') {
+                    gameState.tttBoard[idx] = gameState.tttCurrentPlayer;
+                    this.textContent = gameState.tttCurrentPlayer;
+                    
+                    if (checkTicTacToeWinner()) {
+                        alert(`${gameState.tttCurrentPlayer} переміг!`);
+                        resetTicTacToe();
+                    } else {
+                        gameState.tttCurrentPlayer = gameState.tttCurrentPlayer === 'X' ? 'O' : 'X';
+                    }
+                }
+            });
         });
     }
 
-    function tttClickHandler() {
-        if (this.textContent || gameState.tttBoard[this.dataset.idx]) return;
-        
-        const idx = this.dataset.idx;
-        gameState.tttBoard[idx] = gameState.tttCurrentPlayer;
-        this.textContent = gameState.tttCurrentPlayer;
-        
-        if (checkTTTWin()) {
-            alert(`🏆 ${gameState.tttCurrentPlayer} переміг!`);
-            setTimeout(resetTicTacToe, 1000);
-        } else if (gameState.tttBoard.every(cell => cell)) {
-            alert(`🤝 Нічия!`);
-            resetTicTacToe();
-        } else {
-            gameState.tttCurrentPlayer = gameState.tttCurrentPlayer === 'X' ? 'O' : 'X';
-        }
-    }
-
-    function checkTTTWin() {
-        const b = gameState.tttBoard;
+    function checkTicTacToeWinner() {
+        const board = gameState.tttBoard;
         const lines = [
-            [0,1,2], [3,4,5], [6,7,8],
-            [0,3,6], [1,4,7], [2,5,8],
-            [0,4,8], [2,4,6]
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
         ];
         
         for (let line of lines) {
-            if (b[line[0]] && b[line[0]] === b[line[1]] && b[line[1]] === b[line[2]]) {
+            if (board[line[0]] && board[line[0]] === board[line[1]] && board[line[1]] === board[line[2]]) {
                 return true;
             }
         }
@@ -1116,69 +1054,80 @@
     function resetTicTacToe() {
         gameState.tttBoard = ['', '', '', '', '', '', '', '', ''];
         gameState.tttCurrentPlayer = 'X';
-        document.querySelectorAll('.ttt .c').forEach(cell => {
-            cell.textContent = '';
-        });
-        setupTicTacToe();
+        document.querySelectorAll('.ttt .c').forEach(cell => cell.textContent = '');
     }
 
     function challengeFriend() {
         const friend = document.getElementById('ttt-friend').value;
         const bet = parseFloat(document.getElementById('ttt-bet').value) || 0;
-
+        
         if (friend === 'Оберіть друга...') {
             alert('Оберіть друга!');
             return;
         }
-
-        if (bet > gameState.balance) {
-            alert('Недостатньо коштів для такої ставки!');
+        
+        if (bet > 0 && bet > gameState.balance) {
+            alert('Недостатньо коштів!');
             return;
         }
-
-        alert(`✓ Виклик відправлено користувачу ${friend}!`);
+        
+        alert(`✓ Виклик надіслано ${friend}! (Ставка: ${bet.toFixed(4)} STICK)`);
+        document.getElementById('ttt-friend').value = 'Оберіть друга...';
+        document.getElementById('ttt-bet').value = '0';
     }
 
-    // ===== ЗБЕРЕЖЕННЯ =====
-    function saveUserData() {
-        if (!gameState.user) return;
-        allUsers[gameState.user].balance = gameState.balance;
-        allUsers[gameState.user].friends = gameState.friends;
-        allUsers[gameState.user].friendRequests = gameState.friendRequests;
-        allUsers[gameState.user].privateChatMessages = gameState.privateChatMessages;
-        allUsers[gameState.user].mining = gameState.mining;
-        allUsers[gameState.user].miningStartTime = gameState.miningStartTime;
+    function spin(color) {
+        const bet = parseFloat(document.getElementById('bet-amt').value);
+        
+        if (!bet || bet <= 0) {
+            alert('Введіть ставку!');
+            return;
+        }
+        if (bet > gameState.balance) {
+            alert('Недостатньо коштів!');
+            return;
+        }
+        
+        const wheel = document.getElementById('wheel');
+        wheel.classList.remove('spin');
+        void wheel.offsetWidth;
+        wheel.classList.add('spin');
+        
+        setTimeout(() => {
+            const result = ['red', 'black', 'green'][Math.floor(Math.random() * 3)];
+            const multipliers = { red: 3, black: 5, green: 2 };
+            
+            if (result === color) {
+                gameState.balance += bet * multipliers[color];
+                alert(`🎉 Ви перемогли! +${(bet * multipliers[color]).toFixed(4)} STICK`);
+            } else {
+                gameState.balance -= bet;
+                alert(`😢 Ви програли -${bet.toFixed(4)} STICK`);
+            }
+            
+            updateHeader();
+            updateAccountInfo();
+            saveUserData();
+            saveAllUsersToJsonBin();
+        }, 5000);
     }
 
     function logout() {
-        if (confirm('Ви точно хотите выйти?')) {
+        if (confirm('Ви впевнені?')) {
+            gameState.user = null;
             clearInterval(autoSaveInterval);
             clearInterval(refreshInterval);
             clearInterval(mineInterval);
-            document.getElementById('auth-scr').style.display = 'flex';
+            
             document.getElementById('main-scr').style.display = 'none';
-            gameState = {
-                user: null,
-                password: null,
-                balance: 0,
-                mining: false,
-                friends: [],
-                friendRequests: [],
-                privateChatMessages: {},
-                tttCurrentPlayer: 'X',
-                tttBoard: ['', '', '', '', '', '', '', '', ''],
-                currentChatFriend: null,
-                miningStartTime: 0,
-                lastMiningAmount: 0
-            };
+            document.getElementById('auth-scr').style.display = 'flex';
             document.getElementById('login-u').value = '';
             document.getElementById('login-p').value = '';
         }
     }
 
-    window.addEventListener('load', async () => {
-        await loadAllUsers();
-    });
+    // ІНІЦІАЛІЗАЦІЯ
+    window.addEventListener('load', loadAllUsers);
 </script>
 
 </body>
