@@ -20,6 +20,7 @@ const users = {};
 const devices = {};
 const messages = {};
 const miningIntervals = {};
+const tttGames = {};
 
 // ===== AUTHENTICATION =====
 
@@ -230,7 +231,7 @@ io.on('connection', (socket) => {
     io.to(friendName).emit('friend_list_update', users[friendName].friends);
   });
 
-  // ===== ПРИВАТНІ ЧАТИ =====
+  // ===== ПРИВАТНІ ЧАТИ - РЕАЛЬНИЙ ЧАС =====
   socket.on('send_private_message', (data) => {
     const device = devices[socket.id];
     if (!device) return;
@@ -250,8 +251,12 @@ io.on('connection', (socket) => {
     };
 
     messages[chatKey].push(msg);
+    
+    // МИТТЄВЕ ОНОВЛЕННЯ ДЛЯ ОБОХ КОРИСТУВАЧІВ
     io.to(from).emit('new_message', { from: to, ...msg });
     io.to(to).emit('new_message', { from, ...msg });
+    
+    console.log(`💬 ${from} → ${to}: ${message}`);
   });
 
   socket.on('get_chat_history', (data) => {
@@ -266,7 +271,86 @@ io.on('connection', (socket) => {
     socket.emit('chat_history', { friendName, messages: history });
   });
 
-  // ===== РУЛЕТКА =====
+  // ===== КРЕСТИКИ-НОЛИКИ ОНЛАЙН =====
+  socket.on('start_ttt_game', (data) => {
+    const device = devices[socket.id];
+    if (!device) return;
+
+    const { opponent, bet } = data;
+    const username = device.username;
+    const gameId = `${username}-${opponent}`;
+
+    tttGames[gameId] = {
+      player1: username,
+      player2: opponent,
+      board: ['', '', '', '', '', '', '', '', ''],
+      currentPlayer: 'X',
+      bet: bet
+    };
+
+    io.to(opponent).emit('ttt_challenge', { 
+      from: username, 
+      bet: bet,
+      gameId: gameId 
+    });
+
+    console.log(`🎮 ${username} викликав ${opponent} на крестики-нолики з ставкою ${bet}`);
+  });
+
+  socket.on('accept_ttt_challenge', (data) => {
+    const device = devices[socket.id];
+    if (!device) return;
+
+    const { gameId, opponent } = data;
+    const username = device.username;
+
+    if (tttGames[gameId]) {
+      tttGames[gameId].player2Socket = socket.id;
+      
+      io.to(opponent).emit('ttt_game_started', { 
+        gameId, 
+        opponent: username, 
+        board: tttGames[gameId].board 
+      });
+      socket.emit('ttt_game_started', { 
+        gameId, 
+        opponent, 
+        board: tttGames[gameId].board 
+      });
+
+      console.log(`✓ ${username} прийняв виклик від ${opponent}`);
+    }
+  });
+
+  socket.on('ttt_move', (data) => {
+    const device = devices[socket.id];
+    if (!device) return;
+
+    const { gameId, position } = data;
+    const game = tttGames[gameId];
+
+    if (!game) return;
+
+    game.board[position] = game.currentPlayer;
+    
+    // ПЕРЕДАТИ ХІД СУПЕРНИКУ
+    io.to(game.player1).emit('ttt_board_update', { 
+      gameId, 
+      board: game.board,
+      currentPlayer: game.currentPlayer === 'X' ? 'O' : 'X'
+    });
+    io.to(game.player2).emit('ttt_board_update', { 
+      gameId, 
+      board: game.board,
+      currentPlayer: game.currentPlayer === 'X' ? 'O' : 'X'
+    });
+
+    game.currentPlayer = game.currentPlayer === 'X' ? 'O' : 'X';
+
+    console.log(`🎮 Хід у грі ${gameId}`);
+  });
+
+  // ===== РУЛЕТКА - КРАЩІ ШАНСИ =====
   socket.on('spin_wheel', (data) => {
     const device = devices[socket.id];
     if (!device) return;
@@ -282,12 +366,17 @@ io.on('connection', (socket) => {
     users[username].balance -= betAmount;
 
     setTimeout(() => {
-      const result = Math.random();
+      const result = Math.random() * 100;
       let winColor;
 
-      if (result < 0.48) winColor = 'red';
-      else if (result < 0.96) winColor = 'black';
-      else winColor = 'green';
+      // НОВІ ШАНСИ: RED 45%, BLACK 20%, GREEN 35%
+      if (result < 45) {
+        winColor = 'red';
+      } else if (result < 65) {
+        winColor = 'black';
+      } else {
+        winColor = 'green';
+      }
 
       let won = false;
       let winAmount = 0;
@@ -305,7 +394,7 @@ io.on('connection', (socket) => {
         newBalance: users[username].balance
       });
 
-    }, 5000);
+    }, 1200);
 
     io.to(username).emit('balance_update', { balance: users[username].balance });
   });
@@ -395,7 +484,8 @@ app.get('/api/stats', (req, res) => {
     totalUsers: Object.keys(users).length,
     onlineUsers: new Set(Object.values(devices).map(d => d.username)).size,
     activeDevices: Object.keys(devices).length,
-    activeMining: Object.keys(miningIntervals).length
+    activeMining: Object.keys(miningIntervals).length,
+    activeTTTGames: Object.keys(tttGames).length
   });
 });
 
@@ -405,4 +495,5 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`✅ Сервер запущений на http://localhost:${PORT}`);
   console.log(`📡 WebSocket доступний на ws://localhost:${PORT}`);
+  console.log(`🎮 Підтримуються: Майнинг, Чат (реальний час), Крестики-нолики, Рулетка`);
 });
