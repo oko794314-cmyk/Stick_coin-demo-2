@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>STICK FARM PRO ULTRA v2.0</title>
+    <title>STICK FARM PRO ULTRA v3.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -195,9 +195,9 @@
             border-radius: 50%;
             background: conic-gradient(
                 from 0deg,
-                #ff3366 0deg 172.8deg,
-                #111111 172.8deg 259.2deg,
-                #00ff88 259.2deg 360deg
+                #ff3366 0deg 162deg,
+                #111111 162deg 252deg,
+                #00ff88 252deg 360deg
             );
             border: 6px solid var(--p);
             box-shadow: 0 0 60px rgba(7, 255, 255, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.8);
@@ -235,12 +235,12 @@
         }
 
         .roulette-wheel.spinning {
-            animation: spin 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            animation: spin 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         @keyframes spin {
             from { transform: rotate(0deg); }
-            to { transform: rotate(1080deg); }
+            to { transform: rotate(1440deg); }
         }
 
         .bet-btn {
@@ -320,6 +320,34 @@
             margin-right: 30px;
         }
 
+        /* КРЕСТИКИ-НОЛИКИ */
+        .ttt-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .ttt-cell {
+            aspect-ratio: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--p);
+            border-radius: 10px;
+            font-size: 32px;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            color: var(--p);
+        }
+
+        .ttt-cell:hover {
+            background: rgba(7, 255, 255, 0.1);
+            transform: scale(1.05);
+        }
+
         .notification {
             position: fixed;
             top: 50px;
@@ -332,6 +360,7 @@
             z-index: 1000;
             animation: slideInRight 0.4s ease;
             box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+            max-width: 300px;
         }
 
         @keyframes slideInRight {
@@ -418,11 +447,11 @@
 <!-- AUTH SCREEN -->
 <div id="auth-scr" style="height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;">
     <div class="glass" style="width:100%; max-width:380px; text-align:center;">
-        <h2 style="letter-spacing:5px; margin-bottom:30px; font-size:2.2rem; background: linear-gradient(135deg, var(--p), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">STICK<span style="color:var(--p)">FARM</span></h2>
+        <h2 style="letter-spacing:5px; margin-bottom:30px; font-size:2.2rem; background: linear-gradient(135deg, var(--p), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">STICK FARM v3.0</h2>
         
         <div style="display:flex; gap:10px; margin-bottom:20px;">
             <button class="btn" id="tab-login" onclick="switchAuth('login')" style="background: linear-gradient(135deg, var(--p), var(--blue)); color:#000;">ВХІД</button>
-            <button class="btn" id="tab-register" onclick="switchAuth('register')" style="background: rgba(7, 255, 255, 0.1); color:var(--p); border: 2px solid rgba(7, 255, 255, 0.3);">РЕЄСТР</button>
+            <button class="btn" id="tab-register" onclick="switchAuth('register')" style="background: rgba(7, 255, 255, 0.1); color:var(--p); border: 2px solid rgba(7, 255, 255, 0.3);">РЕЄСТРАЦІЯ</button>
         </div>
 
         <div id="login-form">
@@ -448,7 +477,7 @@
             <b id="h-u">---</b>
         </div>
         <div style="flex:1; text-align: center;">
-            <h1 id="v-bal" style="font-size:2.5rem; margin: 0; background: linear-gradient(135deg, var(--p), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">0.0000</h1>
+            <h1 id="v-bal" style="font-size:2.5rem; margin: 0; background: linear-gradient(135deg, var(--p), var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 200%;">0.0000</h1>
         </div>
         <div class="header-item" style="text-align: right;">
             <small>БАЛАНС</small>
@@ -460,7 +489,7 @@
     <!-- MINING TAB -->
     <div id="tab1" class="view active">
         <h3 style="text-align:center;">⛏️ РЕЖИМ МАЙНІНГУ</h3>
-        <div id="mbtn" style="width: 200px; height: 200px; border-radius: 50%; border: 5px solid var(--g); margin: 40px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: all 0.3s ease; background: radial-gradient(circle at 30% 30%, rgba(0, 255, 136, 0.2), rgba(0, 255, 136, 0)); box-shadow: 0 0 40px rgba(0, 255, 136, 0.3); font-size: 18px; color: var(--g); text-align: center; line-height: 1.4;" onclick="toggleMine()">
+        <div id="mbtn" style="width: 200px; height: 200px; border-radius: 50%; border: 5px solid var(--g); margin: 40px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; user-select: none; font-size: 18px; text-align: center; transition: all 0.3s; box-shadow: 0 0 40px rgba(0, 255, 136, 0.3);" onclick="toggleMine()">
             START<br>MINING
         </div>
         <div style="text-align:center; font-size:12px; color:rgba(7, 255, 255, 0.6);">+0.0001 STICK/сек</div>
@@ -486,9 +515,9 @@
             </div>
             <input type="number" id="bet-amt" placeholder="СТАВКА" min="0.0001" step="0.0001">
             <div style="display: flex; gap: 8px; margin-top: 15px;">
-                <button class="bet-btn red" onclick="spin('red')">🔴 RED<br>48%</button>
-                <button class="bet-btn black" onclick="spin('black')">⚫ BLACK<br>24%</button>
-                <button class="bet-btn green" onclick="spin('green')">🟢 0<br>28%</button>
+                <button class="bet-btn red" onclick="spin('red')">🔴 RED<br>45%</button>
+                <button class="bet-btn black" onclick="spin('black')">⚫ BLACK<br>20%</button>
+                <button class="bet-btn green" onclick="spin('green')">🟢 0<br>35%</button>
             </div>
         </div>
 
@@ -497,6 +526,15 @@
             <select id="ttt-friend" style="margin: 8px 0;"><option value="">Оберіть друга...</option></select>
             <input type="number" id="ttt-bet" placeholder="Ставка (0 = просто гра)" min="0" step="0.0001">
             <button class="btn" onclick="challengeFriend()" style="margin-top:10px;">ВИКЛИКАТИ НА ГРУ</button>
+        </div>
+
+        <!-- АКТИВНА ГРА -->
+        <div id="ttt-game" style="display:none; margin-top:20px;">
+            <div class="glass">
+                <h3 id="ttt-status">🎮 Гра запущена</h3>
+                <div class="ttt-board" id="ttt-board"></div>
+                <button class="btn" onclick="closeTTTGame()" style="margin-top:10px;">ЗАКРИТИ ГРУ</button>
+            </div>
         </div>
     </div>
 
@@ -554,17 +592,18 @@
 </div>
 
 <!-- MODALS -->
-<div id="friend-request-modal" class="modal">
+<div id="ttt-challenge-modal" class="modal">
     <div class="modal-content">
-        <h2 id="friend-request-title">ЗАПИТ НА ДРУЖБУ</h2>
-        <p id="friend-request-text" style="color: rgba(200, 200, 200, 0.8); text-align: center;"></p>
+        <h2>🎮 ВИКЛИК НА ГРУ</h2>
+        <p id="ttt-challenge-text" style="color: rgba(200, 200, 200, 0.8); text-align: center;"></p>
         <div class="btn-group">
-            <button class="btn" style="background: linear-gradient(135deg, var(--g), #00d66a); color:#000;" onclick="acceptFriendRequest()">✓ ПРИЙНЯТИ</button>
-            <button class="btn" style="background: rgba(7, 255, 255, 0.1); color:var(--p); border: 2px solid rgba(7, 255, 255, 0.3);" onclick="rejectFriendRequest()">✕ ВІДХИЛИТИ</button>
+            <button class="btn" style="background: linear-gradient(135deg, var(--g), #00d66a); color:#000;" onclick="acceptTTTChallenge()">✓ ПРИЙНЯТИ</button>
+            <button class="btn" style="background: rgba(7, 255, 255, 0.1); color:var(--p); border: 2px solid rgba(7, 255, 255, 0.3);" onclick="rejectTTTChallenge()">✕ ВІДХИЛИТИ</button>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
 <script>
     const JSONBIN_ID = '6a04f5aaadc21f119a979f14';
     const JSONBIN_MASTER_KEY = '$2a$10$7yePq6PbDAjjMpk4.gfkWeIOrhlJpxaX7Io9/IM0FevWs37W5eaea';
@@ -573,6 +612,8 @@
     let allUsers = {};
     let autoSaveInterval = null;
     let refreshInterval = null;
+    let chatRefreshInterval = null;
+    let socket = null;
 
     let gameState = {
         user: null,
@@ -583,7 +624,11 @@
         friendRequests: [],
         privateChatMessages: {},
         currentChatFriend: null,
-        miningStartTime: 0
+        miningStartTime: 0,
+        currentTTTGame: null,
+        tttOpponent: null,
+        tttBet: 0,
+        tttChallenge: null
     };
 
     let mineInterval = null;
@@ -709,6 +754,7 @@
             updateFriendRequestsList();
             startAutoSave();
             startDataRefresh();
+            startChatRefresh();
             startMining();
 
             showNotification(`✓ Вітаємо, ${username}!`, 'success');
@@ -736,10 +782,17 @@
         refreshInterval = setInterval(() => {
             if (gameState.user) {
                 loadAllUsers();
-                if (gameState.currentChatFriend) displayPrivateChat();
                 updateFriendsList();
             }
         }, 2000);
+    }
+
+    function startChatRefresh() {
+        chatRefreshInterval = setInterval(() => {
+            if (gameState.currentChatFriend) {
+                displayPrivateChat();
+            }
+        }, 500);
     }
 
     function saveUserData() {
@@ -802,16 +855,16 @@
         div.innerHTML = gameState.friendRequests.map((friend, idx) => `
             <div style="background: rgba(0, 0, 0, 0.6); padding: 12px; border-radius: 10px; margin: 8px 0; display: flex; justify-content: space-between; border: 1px solid rgba(7, 255, 255, 0.2);">
                 <span style="flex: 1;">${friend}</span>
-                <button class="btn" onclick="acceptFriendRequest()" style="width: 50px; padding: 8px; background: var(--g); color: #000; font-size: 10px;">✓</button>
-                <button class="btn" onclick="rejectFriendRequest()" style="width: 50px; padding: 8px; background: var(--r); margin-left: 5px; font-size: 10px;">✕</button>
+                <button class="btn" onclick="acceptFriendRequest(${idx})" style="width: 50px; padding: 8px; background: var(--g); color: #000; font-size: 10px;">✓</button>
+                <button class="btn" onclick="rejectFriendRequest(${idx})" style="width: 50px; padding: 8px; background: var(--r); margin-left: 5px; font-size: 10px;">✕</button>
             </div>
         `).join('');
     }
 
-    function acceptFriendRequest() {
-        const friend = gameState.friendRequests[0];
+    function acceptFriendRequest(idx) {
+        const friend = gameState.friendRequests[idx];
         gameState.friends.push(friend);
-        gameState.friendRequests.shift();
+        gameState.friendRequests.splice(idx, 1);
         allUsers[friend].friends = allUsers[friend].friends || [];
         allUsers[friend].friends.push(gameState.user);
         saveUserData();
@@ -819,8 +872,8 @@
         updateFriendRequestsList();
     }
 
-    function rejectFriendRequest() {
-        gameState.friendRequests.shift();
+    function rejectFriendRequest(idx) {
+        gameState.friendRequests.splice(idx, 1);
         saveUserData();
         updateFriendRequestsList();
     }
@@ -838,7 +891,9 @@
 
         gameState.friends.forEach(friend => {
             const div = document.createElement('div');
-            div.style.cssText = 'background: rgba(0, 0, 0, 0.6); padding: 12px; border-radius: 10px; margin: 8px 0; display: flex; justify-content: space-between; border: 1px solid rgba(7, 255, 255, 0.2); cursor: pointer;';
+            div.style.cssText = 'background: rgba(0, 0, 0, 0.6); padding: 12px; border-radius: 10px; margin: 8px 0; display: flex; justify-content: space-between; border: 1px solid rgba(7, 255, 255, 0.2); cursor: pointer; transition: all 0.3s;';
+            div.onmouseover = () => div.style.background = 'rgba(0, 255, 136, 0.1)';
+            div.onmouseout = () => div.style.background = 'rgba(0, 0, 0, 0.6)';
             div.onclick = () => openPrivateChat(friend);
             div.innerHTML = `
                 <span style="flex: 1;">${friend}</span>
@@ -859,7 +914,8 @@
             gameState.privateChatMessages[friendName] = [];
         }
         document.getElementById('tab4').classList.remove('active');
-        document.getElementById('tab4-chat').classList.add('active');
+        const chatTab = document.getElementById('tab4-chat');
+        chatTab.classList.add('active');
         document.getElementById('chat-friend-name').textContent = friendName;
         document.getElementById('chat-friend-avatar').src = allUsers[friendName].avatar;
         displayPrivateChat();
@@ -873,14 +929,13 @@
 
     function displayPrivateChat() {
         const chatDiv = document.getElementById('private-chat-messages');
-        chatDiv.innerHTML = '';
         const messages = gameState.privateChatMessages[gameState.currentChatFriend] || [];
-        messages.forEach(msg => {
+        chatDiv.innerHTML = messages.map(msg => {
             const msgEl = document.createElement('div');
             msgEl.className = `chat-msg ${msg.sender === gameState.user ? 'own' : 'other'}`;
             msgEl.innerHTML = `<small>${msg.sender}</small><br>${msg.text}`;
-            chatDiv.appendChild(msgEl);
-        });
+            return msgEl.outerHTML;
+        }).join('');
         chatDiv.scrollTop = chatDiv.scrollHeight;
     }
 
@@ -917,10 +972,19 @@
         gameState.balance -= betAmount;
         const wheel = document.getElementById('roulette-wheel');
         const rand = Math.random() * 100;
-        let winColor = rand < 48 ? 'red' : (rand < 72 ? 'black' : 'green');
+        
+        // НОВІ ШАНСИ: RED 45%, BLACK 20%, GREEN 35%
+        let winColor;
+        if (rand < 45) {
+            winColor = 'red';
+        } else if (rand < 65) {
+            winColor = 'black';
+        } else {
+            winColor = 'green';
+        }
 
         wheel.classList.add('spinning');
-        let rotation = Math.random() * 1080;
+        let rotation = Math.random() * 1440;
         wheel.style.transform = `rotate(${rotation}deg)`;
 
         setTimeout(() => {
@@ -934,11 +998,72 @@
             }
             updateHeader();
             saveUserData();
-        }, 800);
+        }, 1200);
     }
 
     function challengeFriend() {
-        showNotification('🎮 Виклик відправлено!', 'success');
+        const friend = document.getElementById('ttt-friend').value;
+        const bet = parseFloat(document.getElementById('ttt-bet').value) || 0;
+
+        if (!friend) {
+            showNotification('❌ Оберіть друга!', 'error');
+            return;
+        }
+
+        gameState.tttOpponent = friend;
+        gameState.tttBet = bet;
+        
+        // Інформуємо супернику
+        allUsers[friend].tttChallenge = {
+            from: gameState.user,
+            bet: bet,
+            timestamp: Date.now()
+        };
+
+        showNotification(`🎮 Виклик відправлено ${friend}!`, 'success');
+        
+        // Відкриємо гру
+        document.getElementById('ttt-game').style.display = 'block';
+        renderTTTBoard();
+    }
+
+    function renderTTTBoard() {
+        const board = document.getElementById('ttt-board');
+        board.innerHTML = '';
+        
+        for (let i = 0; i < 9; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'ttt-cell';
+            cell.textContent = '';
+            cell.onclick = () => makeTTTMove(i);
+            board.appendChild(cell);
+        }
+    }
+
+    function makeTTTMove(index) {
+        const cells = document.querySelectorAll('.ttt-cell');
+        if (cells[index].textContent === '') {
+            cells[index].textContent = 'X';
+        }
+    }
+
+    function closeTTTGame() {
+        document.getElementById('ttt-game').style.display = 'none';
+        gameState.currentTTTGame = null;
+        gameState.tttOpponent = null;
+    }
+
+    function acceptTTTChallenge() {
+        // Логіка гри
+        showNotification('🎮 Гра почалась!', 'success');
+        document.getElementById('ttt-challenge-modal').classList.remove('active');
+        document.getElementById('ttt-game').style.display = 'block';
+        renderTTTBoard();
+    }
+
+    function rejectTTTChallenge() {
+        document.getElementById('ttt-challenge-modal').classList.remove('active');
+        gameState.tttChallenge = null;
     }
 
     function transferCoins() {
@@ -955,6 +1080,8 @@
         saveUserData();
         showNotification(`✓ Надіслано ${amount.toFixed(4)} до ${recipient}!`, 'success');
         updateHeader();
+        document.getElementById('transfer-user').value = '';
+        document.getElementById('transfer-amount').value = '';
     }
 
     function saveConfig() {
@@ -965,9 +1092,23 @@
         if (confirm('Вихід?')) {
             clearInterval(autoSaveInterval);
             clearInterval(refreshInterval);
+            clearInterval(chatRefreshInterval);
             clearInterval(mineInterval);
+            gameState = {
+                user: null,
+                password: null,
+                balance: 0,
+                mining: false,
+                friends: [],
+                friendRequests: [],
+                privateChatMessages: {},
+                currentChatFriend: null,
+                miningStartTime: 0
+            };
             document.getElementById('auth-scr').style.display = 'flex';
             document.getElementById('main-scr').style.display = 'none';
+            document.getElementById('login-u').value = '';
+            document.getElementById('login-p').value = '';
         }
     }
 </script>
