@@ -17,7 +17,7 @@
         
         .glass { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid #222; margin-bottom: 15px; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: #fff; border-radius: 8px; font-family: 'Orbitron', sans-serif; font-size: 14px; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron', sans-serif; font-size: 13px; transition: all 0.2s; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: 900; background: var(--p); color: #000; cursor: pointer; text-transform: uppercase; font-family: 'Orbitron', sans-serif; transition: 0.2s; }
         .btn:hover { transform: scale(1.05); box-shadow: 0 0 15px rgba(7, 255, 255, 0.5); }
         .btn:active { transform: scale(0.95); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -31,13 +31,14 @@
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* РУЛЕТКА ВДОСКОНАЛЕНА БЕЗ ЧОРНИХ ПРОБІЛІВ */
+        /* РУЛЕТКА З ЧОРНИМ КОЛЬОРОМ */
         .r-wrap { position: relative; width: 250px; height: 250px; margin: 20px auto; }
         .r-box { width: 100%; height: 100%; border-radius: 50%; border: 6px solid var(--gold); transition: 1.2s cubic-bezier(0.05, 0.5, 0.1, 1); 
             background: conic-gradient(
-                #ff3366 0deg 108deg,
-                #00ff88 108deg 216deg,
-                #ff3366 216deg 360deg
+                #ff3366 0deg 80deg,
+                #00ff88 80deg 160deg,
+                #1a1a1a 160deg 280deg,
+                #ff3366 280deg 360deg
             ); 
             box-shadow: 0 0 30px rgba(255, 204, 0, 0.3); }
         .r-box.spin { animation: wheelSpin 5s ease-out; }
@@ -45,7 +46,7 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(3600deg); }
         }
-        .r-wrap::before { content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 15px solid var(--gold); z-index: 10; }
+        .r-wrap::before { content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 12px solid transparent; border-right: 12px solid transparent; border-top: 15px solid var(--gold); }
 
         .ttt { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; max-width: 210px; margin: 15px auto; }
         .c { aspect-ratio: 1; background: #000; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
@@ -57,7 +58,7 @@
         @keyframes tabPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         .tab span { display: block; font-size: 8px; text-transform: uppercase; margin-top: 4px; }
 
-        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: all 0.2s; }
+        .orb { width: 160px; height: 160px; border-radius: 50%; border: 4px solid var(--g); margin: 30px auto; display: flex; align-items: center; justify-content: center; font-weight: 900; cursor: pointer; transition: 0.3s; }
         .orb:hover { transform: scale(1.08); box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
         .orb.on { border-color: var(--r); animation: miningPulse 1.5s infinite; background: rgba(255, 51, 102, 0.15); }
         @keyframes miningPulse { 0%, 100% { box-shadow: 0 0 10px rgba(255, 51, 102, 0.5); } 50% { box-shadow: 0 0 25px rgba(255, 51, 102, 0.8); } }
@@ -80,7 +81,7 @@
         .btn-group button { flex: 1; padding: 12px; }
 
         .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .auth-tab { flex: 1; padding: 10px; background: #000; border: 2px solid #333; color: #555; cursor: pointer; text-align: center; border-radius: 8px; text-transform: uppercase; font-size: 11px; font-weight: 900; transition: all 0.2s; }
+        .auth-tab { flex: 1; padding: 10px; background: #000; border: 2px solid #333; color: #555; cursor: pointer; text-align: center; border-radius: 8px; text-transform: uppercase; font-size: 11px; }
         .auth-tab.active { background: var(--p); color: #000; border-color: var(--p); transform: scale(1.05); }
 
         .chat-container { display: flex; flex-direction: column; height: 100%; }
@@ -92,7 +93,7 @@
         .chat-header-back:hover { color: var(--p); }
 
         .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 12px; background: #000; border-radius: 8px; padding: 10px; min-height: 150px; }
-        .chat-msg { margin-bottom: 8px; padding: 10px; border-radius: 8px; font-size: 12px; animation: slideIn 0.3s ease; }
+        .chat-msg { margin-bottom: 8px; padding: 10px; border-radius: 8px; font-size: 12px; animation: slideIn 0.3s ease; word-wrap: break-word; }
         .chat-msg.own { background: rgba(7, 255, 255, 0.2); margin-left: 20px; text-align: right; border-left: 3px solid var(--p); }
         .chat-msg.other { background: rgba(0, 255, 136, 0.1); margin-right: 20px; border-left: 3px solid var(--g); }
         .chat-msg-sender { font-size: 10px; color: #888; margin-bottom: 2px; }
@@ -112,7 +113,7 @@
         .sync-indicator.active { background: var(--g); }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 
-        .game-notification { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 15px 25px; border-radius: 12px; font-weight: 900; z-index: 200; animation: slideIn 0.4s ease; box-shadow: 0 0 30px rgba(255, 204, 0, 0.5); max-width: 90%; text-align: center; }
+        .game-notification { position: fixed; top: 80px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; padding: 15px 25px; border-radius: 12px; font-weight: 900; z-index: 999; animation: slideIn 0.3s ease; max-width: 80%; }
 
         .avatar-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 15px 0; }
         .avatar-option { width: 60px; height: 60px; border-radius: 50%; cursor: pointer; border: 2px solid #333; transition: all 0.2s; overflow: hidden; }
@@ -122,6 +123,10 @@
         .stat-card { background: #000; padding: 12px; border-radius: 8px; border: 1px solid #333; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; }
         .stat-label { font-size: 11px; color: #888; text-transform: uppercase; }
         .stat-value { font-weight: 900; color: var(--p); }
+
+        .ttt-request-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card); border: 2px solid var(--g); border-radius: 12px; padding: 20px; z-index: 120; text-align: center; animation: slideIn 0.4s ease; }
+        .ttt-request-modal h3 { color: var(--g); margin-top: 0; }
+        .ttt-request-modal .btn-group { margin-top: 15px; }
 
         @media (max-width: 480px) {
             body { font-size: 14px; }
@@ -153,10 +158,20 @@
 <!-- СПОВІЩЕННЯ ПРО ГРУ -->
 <div id="game-notification" class="game-notification" style="display:none;"></div>
 
+<!-- МОДАЛЬ ЗАПИТУ НА ГРУ -->
+<div id="ttt-request-modal" class="ttt-request-modal" style="display:none;">
+    <h3>🎮 ЗАПИТ НА ГРУ</h3>
+    <div id="ttt-request-text" style="color:#fff; margin:10px 0; font-size:14px;"></div>
+    <div class="btn-group">
+        <button class="btn" type="button" onclick="acceptGameRequest()" style="background:var(--g); color:#000;">ПРИЙНЯТИ</button>
+        <button class="btn" type="button" onclick="rejectGameRequest()" style="background:var(--r); color:#fff;">ВІДХИЛИТИ</button>
+    </div>
+</div>
+
 <!-- ЕКРАН ВХОДУ -->
 <div id="auth-scr" style="height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;">
     <div class="glass" style="width:100%; max-width:320px; text-align:center; margin: auto;">
-        <h2 style="letter-spacing:3px; margin-bottom:30px; font-size:2rem; background: linear-gradient(45deg, var(--p), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">💰 BB COIN</h2>
+        <h2 style="letter-spacing:3px; margin-bottom:30px; font-size:2rem; background: linear-gradient(45deg, var(--p), var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BB COIN</h2>
         
         <div class="auth-tabs">
             <div class="auth-tab active" onclick="switchAuth('login')">Вхід</div>
@@ -213,11 +228,13 @@
         <h3 style="margin-top:0;">🎰 CASINO</h3>
         <div class="glass" style="text-align:center;">
             <p style="margin:0 0 10px; font-size:12px; color:#555;">РУЛЕТКА - РЕАЛІСТИЧНА</p>
+            <p style="margin:0 0 10px; font-size:10px; color:#888;">Чорний колір (велика ставка) = малший шанс, велика винагорода</p>
             <div class="r-wrap"><div id="wheel" class="r-box"></div></div>
             <input type="number" id="bet-amt" placeholder="СТАВКА" min="0.0001" step="0.0001">
             <div class="casino-buttons">
                 <button class="btn" type="button" style="background:#1a1a1a; border:2px solid #ff3366; color:#ff3366;" onclick="spin('red')">🔴 RED (x3)</button>
-                <button class="btn" type="button" style="background:#1a1a1a; border:2px solid #1a1a1a; color:#fff;" onclick="spin('green')">🟢 GREEN (x2)</button>
+                <button class="btn" type="button" style="background:#1a1a1a; border:2px solid #00ff88; color:#00ff88;" onclick="spin('green')">🟢 GREEN (x2)</button>
+                <button class="btn" type="button" style="background:#1a1a1a; border:2px solid #333; color:#fff;" onclick="spin('black')">⬛ BLACK (x5)</button>
             </div>
         </div>
         <h3>🎮 TIC-TAC-TOE НА СТАВКУ</h3>
@@ -251,7 +268,7 @@
         <div id="f-list" style="margin-top:10px;"></div>
     </div>
 
-    <!-- ВКЛ.4-ЧАТ: ПР��ВАТНИЙ ЧАТ -->
+    <!-- ВКЛ.4-ЧАТ: ПРИВАТНИЙ ЧАТ -->
     <div id="tab4-chat" class="view" style="display:none;">
         <div class="chat-container">
             <div class="chat-header">
@@ -363,6 +380,7 @@
     let allUsers = {};
     let autoSaveInterval = null;
     let refreshInterval = null;
+    let pendingGameRequest = null;
 
     let gameState = {
         user: null,
@@ -377,7 +395,8 @@
         tttBoard: ['', '', '', '', '', '', '', '', ''],
         currentChatFriend: null,
         miningStartTime: 0,
-        lastMiningAmount: 0
+        lastMiningAmount: 0,
+        fieldSize: 100  // розмір поля для рулетки
     };
 
     let mineInterval = null;
@@ -615,21 +634,71 @@
                     updateFriendsList();
                 }
                 checkGameInvitations();
+                checkGameMessages();
             }
         }, 1500);
     }
 
     // ===== ПЕРЕВІРКА ЗАПРОСІВ НА ГРУ =====
     function checkGameInvitations() {
-        if (!gameState.gameInvitations) return;
+        if (!gameState.gameInvitations || !allUsers[gameState.user]) return;
         
-        Object.keys(gameState.gameInvitations).forEach(inviteId => {
-            const invite = gameState.gameInvitations[inviteId];
-            if (invite.status === 'pending' && !invite.notified) {
-                showGameNotification(`🎮 ${invite.from} викликав вас на гру! Ставка: ${invite.bet} BB`);
+        allUsers[gameState.user].gameInvitations = allUsers[gameState.user].gameInvitations || {};
+        
+        Object.keys(allUsers[gameState.user].gameInvitations).forEach(inviteId => {
+            const invite = allUsers[gameState.user].gameInvitations[inviteId];
+            if (invite && invite.status === 'pending' && !invite.notified) {
+                pendingGameRequest = invite;
+                showGameRequestModal(invite);
                 invite.notified = true;
             }
         });
+    }
+
+    // ===== ПЕРЕВІРКА ПОВІДОМЛЕНЬ У ЧАТІ =====
+    function checkGameMessages() {
+        if (!gameState.currentChatFriend || !gameState.privateChatMessages[gameState.currentChatFriend]) return;
+        displayPrivateChat();
+    }
+
+    function showGameRequestModal(invite) {
+        const modal = document.getElementById('ttt-request-modal');
+        const text = document.getElementById('ttt-request-text');
+        text.textContent = `${invite.from} викликає вас на гру! Ставка: ${invite.bet} BB`;
+        modal.style.display = 'block';
+    }
+
+    function acceptGameRequest() {
+        if (!pendingGameRequest) return;
+        
+        const modal = document.getElementById('ttt-request-modal');
+        modal.style.display = 'none';
+        
+        const from = pendingGameRequest.from;
+        allUsers[gameState.user].gameInvitations[pendingGameRequest.id].status = 'accepted';
+        
+        showGameNotification(`✅ Ви прийняли запит від ${from}!`);
+        saveUserData();
+        saveAllUsersToJsonBin();
+        triggerRealtimeSync('game-accept');
+        
+        pendingGameRequest = null;
+    }
+
+    function rejectGameRequest() {
+        if (!pendingGameRequest) return;
+        
+        const modal = document.getElementById('ttt-request-modal');
+        modal.style.display = 'none';
+        
+        delete allUsers[gameState.user].gameInvitations[pendingGameRequest.id];
+        
+        showGameNotification(`❌ Запит відхилено`);
+        saveUserData();
+        saveAllUsersToJsonBin();
+        triggerRealtimeSync('game-reject');
+        
+        pendingGameRequest = null;
     }
 
     function resumeMining() {
@@ -807,7 +876,7 @@
             return;
         }
         if (!allUsers[recipient]) {
-            alert('Користувача ��е існує!');
+            alert('Користувача не існує!');
             return;
         }
         if (recipient === gameState.user) {
@@ -838,7 +907,7 @@
         updateAccountInfo();
     }
 
-    // ===== РУЛЕТКА =====
+    // ===== РУЛЕТКА З ЧОРНИМ КОЛЬОРОМ =====
     function spin(color) {
         const amount = parseFloat(document.getElementById('bet-amt').value);
         if (!amount || amount <= 0) {
@@ -859,12 +928,21 @@
             let won = false;
             let multiplier = 0;
             
-            if (color === 'red' && result < 0.33) {
+            // Розраховуємо ймовірності залежно від розміру поля
+            const fieldSize = gameState.fieldSize; // 100 за замовчуванням
+            const redChance = 33 / 100;
+            const greenChance = 33 / 100;
+            const blackChance = (100 - 33 - 33) / 100;
+            
+            if (color === 'red' && result < redChance) {
                 won = true;
                 multiplier = 3;
-            } else if (color === 'green' && result >= 0.33 && result < 0.66) {
+            } else if (color === 'green' && result >= redChance && result < (redChance + greenChance)) {
                 won = true;
                 multiplier = 2;
+            } else if (color === 'black' && result >= (redChance + greenChance) && result < (redChance + greenChance + blackChance)) {
+                won = true;
+                multiplier = 5; // більша ставка = більша винагорода
             }
 
             if (won) {
@@ -958,6 +1036,11 @@
         const requestsDiv = document.getElementById('f-requests');
         requestsDiv.innerHTML = '';
 
+        // Перезавантажити запити з сервера
+        if (allUsers[gameState.user]) {
+            gameState.friendRequests = allUsers[gameState.user].friendRequests || [];
+        }
+
         if (gameState.friendRequests.length === 0) {
             requestsDiv.innerHTML = '<p style="font-size:11px; color:#555; text-align:center;">немає запитів</p>';
             return;
@@ -998,79 +1081,80 @@
 
         updateFriendsList();
         updateFriendRequestsList();
-        updateAccountInfo();
-        showGameNotification(`✅ ${friend} додан в друзі!`);
     }
 
     function rejectFriendRequest(idx) {
+        const friend = gameState.friendRequests[idx];
         gameState.friendRequests.splice(idx, 1);
+        
+        if (allUsers[friend]) {
+            allUsers[friend].friendRequests = (allUsers[friend].friendRequests || []).filter(r => r !== gameState.user);
+        }
+
         saveUserData();
         saveAllUsersToJsonBin();
         triggerRealtimeSync('friend-reject');
+
         updateFriendRequestsList();
     }
 
     function updateFriendsList() {
-        const listDiv = document.getElementById('f-list');
-        const select = document.getElementById('ttt-friend');
-        listDiv.innerHTML = '';
-        select.innerHTML = '<option>Оберіть друга...</option>';
+        const friendsList = document.getElementById('f-list');
+        const tttSelect = document.getElementById('ttt-friend');
         
+        friendsList.innerHTML = '';
+        tttSelect.innerHTML = '<option>Оберіть друга...</option>';
+
         if (gameState.friends.length === 0) {
-            listDiv.innerHTML = '<p style="font-size:11px; color:#555; text-align:center;">у вас немає друзів</p>';
+            friendsList.innerHTML = '<p style="font-size:11px; color:#555; text-align:center;">друзів немає</p>';
             return;
         }
 
-        gameState.friends.forEach((friend, idx) => {
+        gameState.friends.forEach(friend => {
+            if (!allUsers[friend]) return;
+            
             const div = document.createElement('div');
             div.className = 'friend-item';
-            div.style.cursor = 'pointer';
             div.innerHTML = `
-                <div style="display:flex; align-items:center; flex:1;" onclick="openPrivateChat('${friend}')">
+                <div style="display:flex; align-items:center; flex:1; cursor:pointer;" onclick="openPrivateChat('${friend}')">
                     <img src="${allUsers[friend].avatar}" alt="avatar" class="friend-item-avatar">
-                    <span style="font-size:12px;">${friend}</span>
+                    <div>
+                        <div style="font-size:12px; font-weight:900;">${friend}</div>
+                        <div style="font-size:10px; color:#888;">💬 Написати</div>
+                    </div>
                 </div>
-                <button class="btn" type="button" onclick="removeFriend(${idx})" style="width:50px; background:var(--r); padding:6px; font-size:10px;">✕</button>
+                <button class="btn" type="button" onclick="removeFriend('${friend}')" style="width:50px; background:var(--r); color:#fff; font-size:10px; padding:6px;">✕</button>
             `;
-            listDiv.appendChild(div);
-            
-            const option = document.createElement('option');
-            option.value = friend;
-            option.textContent = friend;
-            select.appendChild(option);
+            friendsList.appendChild(div);
+
+            const opt = document.createElement('option');
+            opt.value = friend;
+            opt.textContent = friend;
+            tttSelect.appendChild(opt);
         });
     }
 
-    function removeFriend(idx) {
-        const friend = gameState.friends[idx];
-        gameState.friends.splice(idx, 1);
-        
-        if (allUsers[friend].friends) {
-            const friendIdx = allUsers[friend].friends.indexOf(gameState.user);
-            if (friendIdx > -1) {
-                allUsers[friend].friends.splice(friendIdx, 1);
-            }
-        }
+    function removeFriend(friend) {
+        gameState.friends = gameState.friends.filter(f => f !== friend);
+        allUsers[friend].friends = (allUsers[friend].friends || []).filter(f => f !== gameState.user);
 
         saveUserData();
         saveAllUsersToJsonBin();
         triggerRealtimeSync('friend-remove');
+
         updateFriendsList();
-        updateAccountInfo();
     }
 
-    function openPrivateChat(friendName) {
-        gameState.currentChatFriend = friendName;
+    // ===== ПРИВАТНИЙ ЧАТ З ОНОВЛЕННЯМ БЕЗ ПЕРЕЗАВАНТАЖЕННЯ =====
+    function openPrivateChat(friend) {
+        gameState.currentChatFriend = friend;
         
-        if (!gameState.privateChatMessages[friendName]) {
-            gameState.privateChatMessages[friendName] = [];
-        }
-
         document.getElementById('tab4').style.display = 'none';
         document.getElementById('tab4-chat').style.display = 'block';
-        document.getElementById('chat-friend-name').textContent = friendName;
-        document.getElementById('chat-friend-avatar').src = allUsers[friendName].avatar;
-
+        
+        document.getElementById('chat-friend-name').textContent = friend;
+        document.getElementById('chat-friend-avatar').src = allUsers[friend].avatar;
+        
         displayPrivateChat();
     }
 
@@ -1078,43 +1162,58 @@
         const messagesDiv = document.getElementById('private-chat-messages');
         const friend = gameState.currentChatFriend;
         
-        if (!gameState.privateChatMessages[friend]) {
-            gameState.privateChatMessages[friend] = [];
+        if (!friend || !gameState.privateChatMessages[friend]) {
+            messagesDiv.innerHTML = '<p style="text-align:center; color:#555;">Немає повідомлень</p>';
+            return;
         }
 
-        const messages = gameState.privateChatMessages[friend];
+        const messages = gameState.privateChatMessages[friend] || [];
         messagesDiv.innerHTML = messages.map(msg => `
-            <div class="chat-msg ${msg.from === gameState.user ? 'own' : 'other'}">
-                <div class="chat-msg-sender">${msg.from}</div>
+            <div class="chat-msg ${msg.sender === gameState.user ? 'own' : 'other'}">
+                <div class="chat-msg-sender">${msg.sender}</div>
                 ${msg.text}
             </div>
         `).join('');
-        
+
+        // Автоскрол вниз
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
     function sendPrivateMsg() {
-        const input = document.getElementById('private-msg-in');
-        const text = input.value.trim();
-        const friend = gameState.currentChatFriend;
-
-        if (!text) return;
-
-        const msg = { from: gameState.user, text: text, timestamp: Date.now() };
+        const inputEl = document.getElementById('private-msg-in');
+        const message = inputEl.value.trim();
         
-        gameState.privateChatMessages[friend].push(msg);
-        if (!allUsers[friend].privateChatMessages) {
-            allUsers[friend].privateChatMessages = {};
+        if (!message) return;
+
+        const friend = gameState.currentChatFriend;
+        if (!friend) return;
+
+        // Ініціалізувати масив повідомлень, якщо його немає
+        if (!gameState.privateChatMessages[friend]) {
+            gameState.privateChatMessages[friend] = [];
         }
-        if (!allUsers[friend].privateChatMessages[gameState.user]) {
+
+        const msgObj = {
+            sender: gameState.user,
+            text: message,
+            timestamp: Date.now()
+        };
+
+        gameState.privateChatMessages[friend].push(msgObj);
+        
+        // Також додати в дані друга
+        if (allUsers[friend].privateChatMessages && !allUsers[friend].privateChatMessages[gameState.user]) {
             allUsers[friend].privateChatMessages[gameState.user] = [];
         }
-        allUsers[friend].privateChatMessages[gameState.user].push(msg);
+        if (allUsers[friend].privateChatMessages) {
+            allUsers[friend].privateChatMessages[gameState.user].push(msgObj);
+        }
 
-        input.value = '';
         saveUserData();
         saveAllUsersToJsonBin();
         triggerRealtimeSync('message');
+
+        inputEl.value = '';
         displayPrivateChat();
     }
 
@@ -1130,40 +1229,43 @@
         document.getElementById('tab4').style.display = 'block';
     }
 
-    // ===== TIC-TAC-TOE =====
+    // ===== ТІК-ТАК-ТОЕ =====
     function setupTicTacToe() {
         const cells = document.querySelectorAll('.c');
-        cells.forEach((cell, idx) => {
-            cell.addEventListener('click', () => playTicTacToe(idx));
+        cells.forEach(cell => {
+            cell.addEventListener('click', tttCellClick);
         });
     }
 
-    function playTicTacToe(idx) {
-        if (gameState.tttBoard[idx]) return;
-        
-        gameState.tttBoard[idx] = gameState.tttCurrentPlayer;
-        document.querySelectorAll('.c')[idx].textContent = gameState.tttCurrentPlayer;
-        
-        if (checkTicTacToeWin(gameState.tttCurrentPlayer)) {
-            showGameNotification(`🎮 ${gameState.tttCurrentPlayer} ПЕРЕМІГ!`);
-            return;
+    function tttCellClick(e) {
+        const idx = parseInt(e.target.getAttribute('data-idx'));
+        if (gameState.tttBoard[idx] === '') {
+            gameState.tttBoard[idx] = gameState.tttCurrentPlayer;
+            e.target.textContent = gameState.tttCurrentPlayer;
+            
+            const winner = checkTTTWinner();
+            if (winner) {
+                showGameNotification(`🏆 ${winner} переміг!`);
+            } else {
+                gameState.tttCurrentPlayer = gameState.tttCurrentPlayer === 'X' ? 'O' : 'X';
+            }
         }
-        
-        if (gameState.tttBoard.every(cell => cell)) {
-            showGameNotification(`🤝 НІЧИЯ!`);
-            return;
-        }
-        
-        gameState.tttCurrentPlayer = gameState.tttCurrentPlayer === 'X' ? 'O' : 'X';
     }
 
-    function checkTicTacToeWin(player) {
-        const winCombos = [
-            [0,1,2], [3,4,5], [6,7,8],
-            [0,3,6], [1,4,7], [2,5,8],
-            [0,4,8], [2,4,6]
+    function checkTTTWinner() {
+        const board = gameState.tttBoard;
+        const lines = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
         ];
-        return winCombos.some(combo => combo.every(idx => gameState.tttBoard[idx] === player));
+
+        for (let line of lines) {
+            if (board[line[0]] && board[line[0]] === board[line[1]] && board[line[1]] === board[line[2]]) {
+                return board[line[0]];
+            }
+        }
+        return null;
     }
 
     function resetTicTacToe() {
@@ -1185,29 +1287,38 @@
             return;
         }
 
-        const inviteId = `${gameState.user}-${friend}-${Date.now()}`;
-        
+        const inviteId = `${gameState.user}_${Date.now()}`;
+        const invite = {
+            id: inviteId,
+            from: gameState.user,
+            to: friend,
+            bet: bet,
+            status: 'pending',
+            notified: false,
+            timestamp: Date.now()
+        };
+
         if (!allUsers[friend].gameInvitations) {
             allUsers[friend].gameInvitations = {};
         }
-
-        allUsers[friend].gameInvitations[inviteId] = {
-            from: gameState.user,
-            bet: bet,
-            timestamp: Date.now(),
-            status: 'pending'
-        };
-
+        
+        allUsers[friend].gameInvitations[inviteId] = invite;
+        
+        saveUserData();
         saveAllUsersToJsonBin();
         triggerRealtimeSync('game-challenge');
-        
-        showGameNotification(`🎯 Виклик на гру відправлено ${friend}!`);
-        resetTicTacToe();
+
+        showGameNotification(`🎮 Запит відправлено ${friend}!`);
+        document.getElementById('ttt-bet').value = '';
+        document.getElementById('ttt-friend').value = 'Оберіть друга...';
     }
 
-    // ===== ВИХІД =====
     function logout() {
-        if (confirm('Ви впевнені?')) {
+        if (confirm('Ви впевнені, що хочете вийти?')) {
+            clearInterval(mineInterval);
+            clearInterval(autoSaveInterval);
+            clearInterval(refreshInterval);
+            
             gameState = {
                 user: null,
                 password: null,
@@ -1223,22 +1334,13 @@
                 miningStartTime: 0,
                 lastMiningAmount: 0
             };
-            
-            if (autoSaveInterval) clearInterval(autoSaveInterval);
-            if (refreshInterval) clearInterval(refreshInterval);
-            if (mineInterval) clearInterval(mineInterval);
-            
-            document.getElementById('main-scr').style.display = 'none';
+
             document.getElementById('auth-scr').style.display = 'flex';
-            
+            document.getElementById('main-scr').style.display = 'none';
             document.getElementById('login-u').value = '';
             document.getElementById('login-p').value = '';
         }
     }
-
-    // ІНІЦІАЛІЗАЦІЯ
-    loadAllUsers();
-    checkInternet();
 </script>
 
 </body>
