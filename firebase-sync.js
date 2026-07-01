@@ -258,6 +258,91 @@ async function sendFriendRequestFirebase(fromUser, toUser) {
 }
 
 /**
+ * ✅ ПРИЙНЯТИ ЗАПИТ НА ДРУЖБУ
+ */
+async function acceptFriendRequestFirebase(currentUser, requester) {
+    try {
+        const db = firebase.database();
+        const currentRef = db.ref(`users/${currentUser}`);
+        const requesterRef = db.ref(`users/${requester}`);
+
+        const [currentSnapshot, requesterSnapshot] = await Promise.all([
+            currentRef.once('value'),
+            requesterRef.once('value')
+        ]);
+
+        const currentData = currentSnapshot.val();
+        const requesterData = requesterSnapshot.val();
+
+        if (!currentData || !requesterData) {
+            throw new Error('Користувача не знайдено');
+        }
+
+        const currentRequests = (currentData.friendRequests || []).filter(name => name !== requester);
+        const currentFriends = [...new Set([...(currentData.friends || []), requester])];
+        const requesterFriends = [...new Set([...(requesterData.friends || []), currentUser])];
+
+        await Promise.all([
+            currentRef.child('friendRequests').set(currentRequests),
+            currentRef.child('friends').set(currentFriends),
+            requesterRef.child('friends').set(requesterFriends)
+        ]);
+
+        console.log(`✅ ${currentUser} прийняв запит від ${requester}`);
+        updateSyncIndicator(true);
+        return true;
+    } catch (error) {
+        console.error('❌ Помилка прийняття запиту:', error);
+        updateSyncIndicator(false);
+        return false;
+    }
+}
+
+/**
+ * ❌ ВІДХИЛИТИ ЗАПИТ НА ДРУЖБУ
+ */
+async function rejectFriendRequestFirebase(currentUser, requester) {
+    try {
+        const db = firebase.database();
+        const currentRef = db.ref(`users/${currentUser}`);
+        const snapshot = await currentRef.once('value');
+        const currentData = snapshot.val();
+
+        if (!currentData) {
+            throw new Error('Користувача не знайдено');
+        }
+
+        const currentRequests = (currentData.friendRequests || []).filter(name => name !== requester);
+        await currentRef.child('friendRequests').set(currentRequests);
+
+        console.log(`❌ ${currentUser} відхилив запит від ${requester}`);
+        updateSyncIndicator(true);
+        return true;
+    } catch (error) {
+        console.error('❌ Помилка відхилення запиту:', error);
+        updateSyncIndicator(false);
+        return false;
+    }
+}
+
+/**
+ * ⚙️ ОНОВИТИ ПРОФІЛЬ КОРИСТУВАЧА
+ */
+async function updateUserProfileFirebase(username, updates) {
+    try {
+        const db = firebase.database();
+        await db.ref(`users/${username}`).update(updates);
+        console.log(`⚙️ Профіль ${username} оновлено`);
+        updateSyncIndicator(true);
+        return true;
+    } catch (error) {
+        console.error('❌ Помилка оновлення профілю:', error);
+        updateSyncIndicator(false);
+        return false;
+    }
+}
+
+/**
  * 🎮 ВІДПРАВИТИ ЗАПРОШЕННЯ НА ГРУ
  */
 async function sendGameInvitationFirebase(fromUser, toUser, bet) {
@@ -422,6 +507,9 @@ window.setupChatListener = setupChatListener;
 window.setupGameInvitationListener = setupGameInvitationListener;
 window.sendPrivateMessageFirebase = sendPrivateMessageFirebase;
 window.sendFriendRequestFirebase = sendFriendRequestFirebase;
+window.acceptFriendRequestFirebase = acceptFriendRequestFirebase;
+window.rejectFriendRequestFirebase = rejectFriendRequestFirebase;
+window.updateUserProfileFirebase = updateUserProfileFirebase;
 window.sendGameInvitationFirebase = sendGameInvitationFirebase;
 window.transferCoinsFirebase = transferCoinsFirebase;
 window.updateMiningBalanceFirebase = updateMiningBalanceFirebase;
