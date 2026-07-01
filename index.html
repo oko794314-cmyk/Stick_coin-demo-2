@@ -351,7 +351,6 @@
     document.addEventListener('DOMContentLoaded', () => {
         // Ініціалізувати Firebase
         initFirebaseSync();
-        document.getElementById('firebase-status').style.display = 'block';
         renderRouletteWheel();
         document.getElementById('avatar-file-input').addEventListener('change', handleAvatarFileChange);
     });
@@ -857,20 +856,32 @@
         gameState.currentChatFriend = friendUsername;
         setupChatListener(gameState.user, friendUsername);
         document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
-        document.getElementById('tab4-chat').style.display = 'block';
+        const chatView = document.getElementById('tab4-chat');
+        chatView.style.display = 'block';
+        chatView.style.paddingBottom = '15px';
         document.getElementById('chat-friend-name').textContent = formatUserLabel(friendUsername);
+        const nav = document.querySelector('nav');
+        if (nav) nav.style.display = 'none';
         displayPrivateChat();
     }
 
     function backToFriendsList() {
         gameState.currentChatFriend = null;
         document.getElementById('private-msg-in').value = '';
+        const nav = document.querySelector('nav');
+        if (nav) nav.style.display = '';
+        document.getElementById('tab4-chat').style.paddingBottom = '';
         switchTab(4);
     }
 
     function displayPrivateChat() {
         const container = document.getElementById('private-chat-messages');
-        const messages = gameState.privateChatMessages[gameState.currentChatFriend] || [];
+        const raw = gameState.privateChatMessages[gameState.currentChatFriend];
+        const messages = raw
+            ? (Array.isArray(raw)
+                ? raw
+                : Object.values(raw).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0)))
+            : [];
 
         if (messages.length === 0) {
             container.innerHTML = '<div class="chat-empty">Напишіть перше повідомлення</div>';
@@ -882,7 +893,7 @@
                 ${escapeHtml(msg.text)}
             </div>
         `).join('');
-        
+
         container.scrollTop = container.scrollHeight;
     }
 
