@@ -53,19 +53,23 @@ firefox index.html
 
 ### Архітектура
 - **Frontend**: Pure HTML5 + CSS + Vanilla JavaScript
-- **Backend**: JSONBin (хмарне сховище)
-- **База даних**: localStorage + JSONBin cloud sync
+- **База даних**: Firebase Realtime Database (bb-coin-8ec70)
 - **Стилізація**: CSS Grid + Glassmorphism + Gradients
 
-### API Інтеграція
-- JSONBin для збереження даних
-- Резервна копія в localStorage
-- Реал-тайм синхронізація
+### Firebase Інтеграція
+- Збереження та завантаження даних користувачів через Firebase Realtime Database
+- Реал-тайм синхронізація (запити на дружбу, чати, баланс)
+- Резервна копія в localStorage при помилках
+
+### Запуск
+1. Відкрийте `index.html` у браузері або використовуйте GitHub Pages
+2. Firebase налаштований і підключається автоматично (конфіг у `firebase-config.js`)
+3. Реєструйтесь та грайте!
 
 ### Безпека
-- Паролі зберігаються локально
-- Немає експозиції персональних даних
-- CORS-safe запити
+- Firebase Rules обмежують доступ до даних
+- Паролі зберігаються як plain-text (рекомендується хешування для продакшн)
+- CORS-safe запити через Firebase SDK
 
 ---
 
