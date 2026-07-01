@@ -319,9 +319,12 @@
     const rouletteSpinDuration = 5600;
     const roulettePointerPadding = 2;
     const rouletteMinSegmentRange = 0.1;
+    const rouletteMinFullTurns = 6;
+    const rouletteExtraFullTurnsRange = 3;
     const maxDisplayNameLength = 24;
     const minPasswordLength = 4;
     const maxAvatarFileSize = 2 * 1024 * 1024;
+    const maxAvatarFileSizeMB = maxAvatarFileSize / (1024 * 1024);
 
     let allUsers = {};
     let mineInterval = null;
@@ -667,7 +670,7 @@
         const finalRotationNormalized = normalizeAngle(360 - stopWheelAngle);
         const currentRotationNormalized = normalizeAngle(gameState.rouletteRotation);
         const deltaRotation = normalizeAngle(finalRotationNormalized - currentRotationNormalized);
-        const fullTurns = 6 + Math.floor(Math.random() * 3);
+        const fullTurns = rouletteMinFullTurns + Math.floor(Math.random() * rouletteExtraFullTurnsRange);
         const targetRotation = gameState.rouletteRotation + (fullTurns * 360) + deltaRotation;
 
         gameState.rouletteSpinning = true;
@@ -998,7 +1001,7 @@
             return;
         }
         if (file.size > maxAvatarFileSize) {
-            alert(`Зображення має бути менше ${maxAvatarFileSize / (1024 * 1024)} MB`);
+            alert(`Зображення має бути менше ${maxAvatarFileSizeMB} MB`);
             event.target.value = '';
             return;
         }
@@ -1074,7 +1077,7 @@
             return;
         }
 
-        const success = await updateUserProfileFirebase(gameState.user, { password: newPassword });
+        const success = await updateUserPasswordFirebase(gameState.user, newPassword);
         if (!success) {
             alert('Не вдалося оновити пароль');
             return;

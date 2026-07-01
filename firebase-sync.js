@@ -331,7 +331,7 @@ async function rejectFriendRequestFirebase(currentUser, requester) {
 async function updateUserProfileFirebase(username, updates) {
     try {
         const db = firebase.database();
-        const allowedFields = ['avatar', 'displayName', 'password'];
+        const allowedFields = ['avatar', 'displayName'];
         const safeUpdates = Object.fromEntries(
             Object.entries(updates).filter(([key]) => allowedFields.includes(key))
         );
@@ -346,6 +346,23 @@ async function updateUserProfileFirebase(username, updates) {
         return true;
     } catch (error) {
         console.error('❌ Помилка оновлення профілю:', error);
+        updateSyncIndicator(false);
+        return false;
+    }
+}
+
+/**
+ * 🔒 ОНОВИТИ ПАРОЛЬ КОРИСТУВАЧА
+ */
+async function updateUserPasswordFirebase(username, password) {
+    try {
+        const db = firebase.database();
+        await db.ref(`users/${username}/password`).set(password);
+        console.log(`🔒 Пароль ${username} оновлено`);
+        updateSyncIndicator(true);
+        return true;
+    } catch (error) {
+        console.error('❌ Помилка оновлення пароля:', error);
         updateSyncIndicator(false);
         return false;
     }
@@ -519,6 +536,7 @@ window.sendFriendRequestFirebase = sendFriendRequestFirebase;
 window.acceptFriendRequestFirebase = acceptFriendRequestFirebase;
 window.rejectFriendRequestFirebase = rejectFriendRequestFirebase;
 window.updateUserProfileFirebase = updateUserProfileFirebase;
+window.updateUserPasswordFirebase = updateUserPasswordFirebase;
 window.sendGameInvitationFirebase = sendGameInvitationFirebase;
 window.transferCoinsFirebase = transferCoinsFirebase;
 window.updateMiningBalanceFirebase = updateMiningBalanceFirebase;
