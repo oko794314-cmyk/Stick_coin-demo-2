@@ -18,7 +18,7 @@
     <script src="firebase-config.js"></script>
     
     <style>
-        :root { --p: #07FFFF; --bg: #030303; --card: #0d0d0d; --g: #00ff88; --r: #ff3366; --gold: #ffcc00; --black: #1a1a1a; }
+        :root { --p: #07FFFF; --bg: #030303; --card: #0d0d0d; --g: #00ff88; --r: #ff3366; --gold: #ffcc00; --black: #1a1a1a; --app-nav-safe-bottom: calc(20px + env(safe-area-inset-bottom, 0px)); --view-bottom-padding: 124px; --view-bottom-padding-mobile: 130px; --chat-open-padding-bottom: 26px; }
         * { box-sizing: border-box; font-family: 'Orbitron', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); color: #fff; margin: 0; overflow: hidden; display: flex; flex-direction: column; height: 100vh; }
         
@@ -33,7 +33,7 @@
         .av { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--p); object-fit: cover; background: #1a1a1a; cursor: pointer; transition: 0.2s; }
         .av:hover { transform: scale(1.1); box-shadow: 0 0 10px rgba(7, 255, 255, 0.7); }
 
-        .view { flex: 1; padding: 15px; display: none; overflow-y: auto; padding-bottom: 124px; }
+        .view { flex: 1; padding: 15px; display: none; overflow-y: auto; padding-bottom: var(--view-bottom-padding); }
         .view.active { display: block; animation: slideIn 0.4s ease; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -47,7 +47,7 @@
         .c { aspect-ratio: 1; background: #000; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 8px; cursor: pointer; }
         .c:hover { border-color: var(--p); transform: scale(1.05); box-shadow: 0 0 10px rgba(7, 255, 255, 0.3); }
 
-        nav { position: fixed; bottom: 0; width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); background: #000; border-top: 1px solid #111; padding: 10px 0 calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 50; box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.6); }
+        nav { position: fixed; bottom: 0; width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); background: #000; border-top: 1px solid #111; padding: 10px 0 var(--app-nav-safe-bottom); z-index: 50; box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.6); }
         .tab { text-align: center; color: #444; font-size: 22px; cursor: pointer; transition: all 0.3s; }
         .tab.active { color: var(--p); animation: tabPulse 0.5s ease; }
         @keyframes tabPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
@@ -114,7 +114,7 @@
 
         @media (max-width: 480px) {
             body { font-size: 14px; }
-            .view { padding: 12px; padding-bottom: 130px; }
+            .view { padding: 12px; padding-bottom: var(--view-bottom-padding-mobile); }
             input, select, .btn { padding: 11px; font-size: 13px; }
             .orb { width: 140px; height: 140px; font-size: 14px; }
             .chat-msg { max-width: 86%; }
@@ -336,6 +336,7 @@
     const rouletteMinFullTurns = 6;
     const rouletteExtraFullTurnsRange = 3;
     const chatPollingIntervalMs = 2500;
+    const chatSignatureTextPreviewLength = 48;
     const maxDisplayNameLength = 24;
     const minPasswordLength = 4;
     const maxAvatarFileSize = 2 * 1024 * 1024;
@@ -491,7 +492,7 @@
 
     function getChatMessagesSignature(messages) {
         const last = messages[messages.length - 1];
-        const lastPreview = String(last?.text || '').slice(0, 48);
+        const lastPreview = String(last?.text || '').slice(0, chatSignatureTextPreviewLength);
         const lastStamp = last ? `${last.timestamp || 0}:${last.from || ''}:${lastPreview}` : 'none';
         return `${messages.length}|${lastStamp}`;
     }
@@ -540,6 +541,7 @@
         chatRealtimeBridge.activeChatFriend = friendUsername;
         refreshChatByPolling(currentUser, friendUsername);
         chatRealtimeBridge.timer = setInterval(() => {
+            // Перевіряємо і стан bridge, і поточний відкритий чат, щоб interval не працював для неактивного діалогу.
             if (chatRealtimeBridge.activeChatFriend !== friendUsername || gameState.currentChatFriend !== friendUsername) {
                 return;
             }
@@ -1007,7 +1009,7 @@
         document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
         const chatView = document.getElementById('tab4-chat');
         chatView.style.display = 'block';
-        chatView.style.paddingBottom = '26px';
+        chatView.style.paddingBottom = 'var(--chat-open-padding-bottom)';
         document.getElementById('chat-friend-name').textContent = formatUserLabel(friendUsername);
         const nav = document.querySelector('nav');
         if (nav) nav.style.display = 'none';
