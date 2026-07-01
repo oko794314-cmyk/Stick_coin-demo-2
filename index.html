@@ -33,7 +33,7 @@
         .av { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--p); object-fit: cover; background: #1a1a1a; cursor: pointer; transition: 0.2s; }
         .av:hover { transform: scale(1.1); box-shadow: 0 0 10px rgba(7, 255, 255, 0.7); }
 
-        .view { flex: 1; padding: 15px; display: none; overflow-y: auto; padding-bottom: 100px; }
+        .view { flex: 1; padding: 15px; display: none; overflow-y: auto; padding-bottom: 124px; }
         .view.active { display: block; animation: slideIn 0.4s ease; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -47,7 +47,7 @@
         .c { aspect-ratio: 1; background: #000; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 8px; cursor: pointer; }
         .c:hover { border-color: var(--p); transform: scale(1.05); box-shadow: 0 0 10px rgba(7, 255, 255, 0.3); }
 
-        nav { position: fixed; bottom: 0; width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); background: #000; border-top: 1px solid #111; padding: 12px 0 25px; z-index: 50; }
+        nav { position: fixed; bottom: 0; width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); background: #000; border-top: 1px solid #111; padding: 10px 0 calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 50; box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.6); }
         .tab { text-align: center; color: #444; font-size: 22px; cursor: pointer; transition: all 0.3s; }
         .tab.active { color: var(--p); animation: tabPulse 0.5s ease; }
         @keyframes tabPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
@@ -57,14 +57,18 @@
         .orb:hover { transform: scale(1.08); box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
         .orb.on { border-color: var(--r); animation: miningPulse 1.5s infinite; background: rgba(255, 51, 102, 0.15); }
 
-        .friend-item { background: #000; padding: 10px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; cursor:pointer; transition: all 0.2s; }
+        .friend-item { background: #000; padding: 10px 12px; border-radius: 12px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; cursor:pointer; transition: all 0.2s; gap: 10px; }
         .friend-item:hover { border-color: var(--p); background: rgba(7, 255, 255, 0.05); }
         .friend-item button { width: 60px; padding: 8px; font-size: 11px; }
-        .friend-item-main { display:flex; flex-direction:column; gap:2px; }
+        .friend-item-main { display:flex; flex-direction:column; gap:2px; flex: 1; min-width: 0; }
         .friend-item-subtitle { font-size:10px; color:#666; }
         .request-actions { display:flex; gap:8px; margin-top:10px; }
         .request-actions .btn { margin:0; }
-        .chat-msg { white-space: pre-wrap; word-break: break-word; }
+        .friend-item-identity { display:flex; align-items:center; gap:10px; min-width:0; }
+        .list-avatar-wrap { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(7, 255, 255, 0.45); overflow: hidden; flex-shrink: 0; background: #050505; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px rgba(7, 255, 255, 0.15); }
+        .list-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .list-avatar-fallback { width: 100%; height: 100%; display:flex; align-items:center; justify-content:center; font-size: 11px; font-weight: 900; color: var(--p); background: linear-gradient(145deg, rgba(7, 255, 255, 0.14), rgba(0, 255, 136, 0.1)); }
+        .chat-text { white-space: pre-wrap; word-break: break-word; overflow-wrap: anywhere; line-height: 1.45; font-size: 13px; }
         .chat-empty { color:#666; text-align:center; padding:20px 0; font-size:12px; }
         .settings-section { margin-bottom:15px; }
         .settings-label { display:block; font-size:10px; color:var(--p); margin-top:12px; }
@@ -82,11 +86,19 @@
         .modal.active { display: flex; }
         .modal-content { background: var(--card); padding: 25px; border-radius: 12px; border: 2px solid var(--p); max-width: 350px; width: 90%; }
 
-        .chat-container { display: flex; flex-direction: column; height: 100%; }
-        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 12px; background: #000; border-radius: 8px; padding: 10px; min-height: 150px; }
-        .chat-msg { margin-bottom: 8px; padding: 10px; border-radius: 8px; font-size: 12px; animation: slideIn 0.3s ease; }
-        .chat-msg.own { background: rgba(7, 255, 255, 0.2); margin-left: 20px; text-align: right; border-left: 3px solid var(--p); }
-        .chat-msg.other { background: rgba(0, 255, 136, 0.1); margin-right: 20px; border-left: 3px solid var(--g); }
+        .chat-container { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+        .chat-messages { flex: 1; overflow-y: auto; margin-bottom: 14px; background: rgba(0, 0, 0, 0.85); border-radius: 14px; border: 1px solid #1a1a1a; padding: 12px; min-height: 150px; box-shadow: inset 0 0 18px rgba(7, 255, 255, 0.06); }
+        .chat-row { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 10px; animation: slideIn 0.22s ease; }
+        .chat-row.own { flex-direction: row-reverse; }
+        .chat-avatar-wrap { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(7, 255, 255, 0.5); overflow: hidden; flex-shrink: 0; background: #050505; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px rgba(7, 255, 255, 0.12); }
+        .chat-avatar-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .chat-avatar-fallback { width: 100%; height: 100%; display:flex; align-items:center; justify-content:center; font-size: 10px; font-weight: 900; color: var(--p); background: linear-gradient(145deg, rgba(7, 255, 255, 0.16), rgba(0, 255, 136, 0.1)); }
+        .chat-msg { max-width: min(82%, 430px); border-radius: 14px; padding: 9px 11px; border: 1px solid transparent; }
+        .chat-row.own .chat-msg { background: rgba(7, 255, 255, 0.15); border-color: rgba(7, 255, 255, 0.25); border-bottom-right-radius: 5px; }
+        .chat-row.other .chat-msg { background: rgba(0, 255, 136, 0.1); border-color: rgba(0, 255, 136, 0.2); border-bottom-left-radius: 5px; }
+        .chat-meta { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:9px; color:#90a4ae; margin-bottom:4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .chat-input-wrap { display:flex; gap:8px; position: sticky; bottom: 6px; padding: 8px; border-radius: 12px; background: linear-gradient(180deg, rgba(3, 3, 3, 0), rgba(3, 3, 3, 0.92) 42%); backdrop-filter: blur(2px); z-index: 2; }
+        .chat-input-wrap .btn { margin: 0; width: 78px; }
 
         .internet-check { position: fixed; top: 10px; right: 10px; z-index: 999; padding: 10px 15px; border-radius: 20px; font-size: 11px; display: none; }
         .internet-check.no-connection { background: var(--r); display: block; }
@@ -102,9 +114,11 @@
 
         @media (max-width: 480px) {
             body { font-size: 14px; }
-            .view { padding: 12px; padding-bottom: 100px; }
+            .view { padding: 12px; padding-bottom: 130px; }
             input, select, .btn { padding: 11px; font-size: 13px; }
             .orb { width: 140px; height: 140px; font-size: 14px; }
+            .chat-msg { max-width: 86%; }
+            .chat-input-wrap { bottom: 10px; }
         }
     </style>
 </head>
@@ -231,9 +245,9 @@
                 </div>
             </div>
             <div class="chat-messages" id="private-chat-messages"></div>
-            <div style="display:flex; gap:8px;">
+            <div class="chat-input-wrap">
                 <input type="text" id="private-msg-in" placeholder="Повідомлення..." onkeypress="handlePrivateChatKeypress(event)">
-                <button class="btn" onclick="sendPrivateMsg()" style="width:70px;">></button>
+                <button class="btn" onclick="sendPrivateMsg()">></button>
             </div>
         </div>
     </div>
@@ -321,6 +335,7 @@
     const rouletteMinSegmentRange = 0.1;
     const rouletteMinFullTurns = 6;
     const rouletteExtraFullTurnsRange = 3;
+    const chatPollingIntervalMs = 2500;
     const maxDisplayNameLength = 24;
     const minPasswordLength = 4;
     const maxAvatarFileSize = 2 * 1024 * 1024;
@@ -329,6 +344,10 @@
     let allUsers = {};
     let mineInterval = null;
     let pendingGameRequest = null;
+    const chatRealtimeBridge = {
+        timer: null,
+        activeChatFriend: null
+    };
 
     let gameState = {
         user: null,
@@ -339,6 +358,7 @@
         friends: [],
         friendRequests: [],
         privateChatMessages: {},
+        chatMessageSignatures: {},
         gameInvitations: {},
         currentChatFriend: null,
         miningStartTime: 0,
@@ -409,6 +429,118 @@
         const displayName = (userData.displayName || username || '').trim();
         return displayName !== username ? `${displayName} (@${username})` : username;
     }
+
+    function sanitizeAvatarUrl(url) {
+        if (typeof url !== 'string') return '';
+        const value = url.trim();
+        if (!value) return '';
+        if (value.startsWith('data:image/')) return value;
+        if (/^https?:\/\//i.test(value)) return value;
+        return '';
+    }
+
+    function getUserInitials(username) {
+        const label = formatUserLabel(username).replace(/\(.*\)/, '').trim();
+        const parts = label.split(/\s+/).filter(Boolean);
+        if (parts.length >= 2) {
+            return `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase();
+        }
+        return (label.slice(0, 2) || '?').toUpperCase();
+    }
+
+    function getUserAvatarUrl(username) {
+        return sanitizeAvatarUrl((allUsers[username] || {}).avatar || '');
+    }
+
+    function buildListAvatarHtml(username) {
+        const avatar = getUserAvatarUrl(username);
+        const initials = escapeHtml(getUserInitials(username));
+        const alt = escapeHtml(formatUserLabel(username));
+        return `
+            <span class="list-avatar-wrap">
+                ${avatar ? `<img src="${escapeHtml(avatar)}" alt="${alt}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                <span class="list-avatar-fallback" style="${avatar ? 'display:none;' : 'display:flex;'}">${initials}</span>
+            </span>
+        `;
+    }
+
+    function buildChatAvatarHtml(username) {
+        const avatar = getUserAvatarUrl(username);
+        const initials = escapeHtml(getUserInitials(username));
+        const alt = escapeHtml(formatUserLabel(username));
+        return `
+            <span class="chat-avatar-wrap">
+                ${avatar ? `<img src="${escapeHtml(avatar)}" alt="${alt}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                <span class="chat-avatar-fallback" style="${avatar ? 'display:none;' : 'display:flex;'}">${initials}</span>
+            </span>
+        `;
+    }
+
+    function normalizeChatMessages(rawMessages) {
+        if (!rawMessages) return [];
+        const list = Array.isArray(rawMessages) ? rawMessages : Object.values(rawMessages);
+        return list
+            .filter(item => item && typeof item.text === 'string')
+            .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+    }
+
+    function getChatMessagesSignature(messages) {
+        const last = messages[messages.length - 1];
+        const lastStamp = last ? `${last.timestamp || 0}:${last.from || ''}:${last.text || ''}` : 'none';
+        return `${messages.length}|${lastStamp}`;
+    }
+
+    function applyIncomingChatMessages(friendUsername, rawMessages) {
+        const normalized = normalizeChatMessages(rawMessages);
+        const signature = getChatMessagesSignature(normalized);
+        if (gameState.chatMessageSignatures[friendUsername] === signature) {
+            return false;
+        }
+        gameState.privateChatMessages[friendUsername] = normalized;
+        gameState.chatMessageSignatures[friendUsername] = signature;
+        if (gameState.currentChatFriend === friendUsername) {
+            displayPrivateChat();
+        }
+        return true;
+    }
+
+    function formatChatTimestamp(timestamp) {
+        if (!timestamp) return '--:--';
+        const parsed = new Date(Number(timestamp));
+        if (Number.isNaN(parsed.getTime())) return '--:--';
+        return parsed.toLocaleTimeString('uk-UA', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    async function refreshChatByPolling(currentUser, friendUsername) {
+        if (!currentUser || !friendUsername || typeof loadChatMessagesFirebase !== 'function') return;
+        try {
+            const messages = await loadChatMessagesFirebase(currentUser, friendUsername);
+            applyIncomingChatMessages(friendUsername, messages);
+        } catch (error) {
+            console.warn('⚠️ Помилка polling чату:', error);
+        }
+    }
+
+    function stopChatRealtimeBridge() {
+        if (chatRealtimeBridge.timer) {
+            clearInterval(chatRealtimeBridge.timer);
+            chatRealtimeBridge.timer = null;
+        }
+        chatRealtimeBridge.activeChatFriend = null;
+    }
+
+    function startChatRealtimeBridge(currentUser, friendUsername) {
+        stopChatRealtimeBridge();
+        chatRealtimeBridge.activeChatFriend = friendUsername;
+        refreshChatByPolling(currentUser, friendUsername);
+        chatRealtimeBridge.timer = setInterval(() => {
+            refreshChatByPolling(currentUser, friendUsername);
+        }, chatPollingIntervalMs);
+    }
+
+    window.handleRealtimeChatSnapshot = (friendUsername, rawMessages) => {
+        applyIncomingChatMessages(friendUsername, rawMessages);
+    };
 
     function updateCachedUser(username, updates) {
         allUsers[username] = {
@@ -500,6 +632,7 @@
         gameState.friends = userData.friends || [];
         gameState.friendRequests = userData.friendRequests || [];
         gameState.privateChatMessages = {};
+        gameState.chatMessageSignatures = {};
         gameState.currentChatFriend = null;
         gameState.expandedFriendRequest = null;
 
@@ -776,9 +909,12 @@
 
             const expanded = gameState.expandedFriendRequest === requester;
             card.innerHTML = `
-                <div class="friend-item-main">
-                    <strong>${escapeHtml(formatUserLabel(requester))}</strong>
-                    <span class="friend-item-subtitle">${expanded ? 'Оберіть дію для запиту' : 'Натисніть, щоб відкрити дії'}</span>
+                <div class="friend-item-identity">
+                    ${buildListAvatarHtml(requester)}
+                    <div class="friend-item-main">
+                        <strong>${escapeHtml(formatUserLabel(requester))}</strong>
+                        <span class="friend-item-subtitle">${expanded ? 'Оберіть дію для запиту' : 'Натисніть, щоб відкрити дії'}</span>
+                    </div>
                 </div>
             `;
 
@@ -835,9 +971,12 @@
             item.setAttribute('role', 'button');
             item.setAttribute('tabindex', '0');
             item.innerHTML = `
-                <div class="friend-item-main">
-                    <strong>${escapeHtml(formatUserLabel(friend))}</strong>
-                    <span class="friend-item-subtitle">Натисніть, щоб відкрити чат</span>
+                <div class="friend-item-identity">
+                    ${buildListAvatarHtml(friend)}
+                    <div class="friend-item-main">
+                        <strong>${escapeHtml(formatUserLabel(friend))}</strong>
+                        <span class="friend-item-subtitle">Натисніть, щоб відкрити чат</span>
+                    </div>
                 </div>
                 <span aria-hidden="true">💬</span>
             `;
@@ -854,11 +993,12 @@
 
     function openChat(friendUsername) {
         gameState.currentChatFriend = friendUsername;
+        startChatRealtimeBridge(gameState.user, friendUsername);
         setupChatListener(gameState.user, friendUsername);
         document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
         const chatView = document.getElementById('tab4-chat');
         chatView.style.display = 'block';
-        chatView.style.paddingBottom = '15px';
+        chatView.style.paddingBottom = '26px';
         document.getElementById('chat-friend-name').textContent = formatUserLabel(friendUsername);
         const nav = document.querySelector('nav');
         if (nav) nav.style.display = 'none';
@@ -866,6 +1006,7 @@
     }
 
     function backToFriendsList() {
+        stopChatRealtimeBridge();
         gameState.currentChatFriend = null;
         document.getElementById('private-msg-in').value = '';
         const nav = document.querySelector('nav');
@@ -877,11 +1018,7 @@
     function displayPrivateChat() {
         const container = document.getElementById('private-chat-messages');
         const raw = gameState.privateChatMessages[gameState.currentChatFriend];
-        const messages = raw
-            ? (Array.isArray(raw)
-                ? raw
-                : Object.values(raw).sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0)))
-            : [];
+        const messages = normalizeChatMessages(raw);
 
         if (messages.length === 0) {
             container.innerHTML = '<div class="chat-empty">Напишіть перше повідомлення</div>';
@@ -889,8 +1026,15 @@
         }
 
         container.innerHTML = messages.map(msg => `
-            <div class="chat-msg ${msg.from === gameState.user ? 'own' : 'other'}">
-                ${escapeHtml(msg.text)}
+            <div class="chat-row ${msg.from === gameState.user ? 'own' : 'other'}">
+                ${buildChatAvatarHtml(msg.from)}
+                <div class="chat-msg">
+                    <div class="chat-meta">
+                        <span>${escapeHtml(formatUserLabel(msg.from))}</span>
+                        <span>${escapeHtml(formatChatTimestamp(msg.timestamp))}</span>
+                    </div>
+                    <div class="chat-text">${escapeHtml(msg.text)}</div>
+                </div>
             </div>
         `).join('');
 
@@ -1105,6 +1249,7 @@
     }
 
     function logout() {
+        stopChatRealtimeBridge();
         removeAllListeners();
         gameState.user = null;
         gameState.displayName = null;
@@ -1113,6 +1258,7 @@
         gameState.friends = [];
         gameState.friendRequests = [];
         gameState.privateChatMessages = {};
+        gameState.chatMessageSignatures = {};
         gameState.currentChatFriend = null;
         gameState.expandedFriendRequest = null;
         allUsers = {};
