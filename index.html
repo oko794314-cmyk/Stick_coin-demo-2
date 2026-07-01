@@ -443,7 +443,7 @@
         const label = formatUserLabel(username).replace(/\(.*\)/, '').trim();
         const parts = label.split(/\s+/).filter(Boolean);
         if (parts.length >= 2) {
-            return `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase();
+            return parts.slice(0, 2).map(part => part[0] || '').join('').toUpperCase() || '?';
         }
         return (label.slice(0, 2) || '?').toUpperCase();
     }
@@ -452,13 +452,18 @@
         return sanitizeAvatarUrl((allUsers[username] || {}).avatar || '');
     }
 
+    function getAvatarImageHtml(avatar, alt) {
+        if (!avatar) return '';
+        return `<img src="${escapeHtml(avatar)}" alt="${alt}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">`;
+    }
+
     function buildListAvatarHtml(username) {
         const avatar = getUserAvatarUrl(username);
         const initials = escapeHtml(getUserInitials(username));
         const alt = escapeHtml(formatUserLabel(username));
         return `
             <span class="list-avatar-wrap">
-                ${avatar ? `<img src="${escapeHtml(avatar)}" alt="${alt}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                ${getAvatarImageHtml(avatar, alt)}
                 <span class="list-avatar-fallback" style="${avatar ? 'display:none;' : 'display:flex;'}">${initials}</span>
             </span>
         `;
@@ -470,7 +475,7 @@
         const alt = escapeHtml(formatUserLabel(username));
         return `
             <span class="chat-avatar-wrap">
-                ${avatar ? `<img src="${escapeHtml(avatar)}" alt="${alt}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">` : ''}
+                ${getAvatarImageHtml(avatar, alt)}
                 <span class="chat-avatar-fallback" style="${avatar ? 'display:none;' : 'display:flex;'}">${initials}</span>
             </span>
         `;
@@ -486,7 +491,8 @@
 
     function getChatMessagesSignature(messages) {
         const last = messages[messages.length - 1];
-        const lastStamp = last ? `${last.timestamp || 0}:${last.from || ''}:${last.text || ''}` : 'none';
+        const lastPreview = String(last?.text || '').slice(0, 48);
+        const lastStamp = last ? `${last.timestamp || 0}:${last.from || ''}:${lastPreview}` : 'none';
         return `${messages.length}|${lastStamp}`;
     }
 
@@ -517,7 +523,7 @@
             const messages = await loadChatMessagesFirebase(currentUser, friendUsername);
             applyIncomingChatMessages(friendUsername, messages);
         } catch (error) {
-            console.warn('⚠️ Помилка polling чату:', error);
+            console.warn(`⚠️ Помилка polling чату (${currentUser} -> ${friendUsername}):`, error);
         }
     }
 
@@ -534,6 +540,9 @@
         chatRealtimeBridge.activeChatFriend = friendUsername;
         refreshChatByPolling(currentUser, friendUsername);
         chatRealtimeBridge.timer = setInterval(() => {
+            if (chatRealtimeBridge.activeChatFriend !== friendUsername || gameState.currentChatFriend !== friendUsername) {
+                return;
+            }
             refreshChatByPolling(currentUser, friendUsername);
         }, chatPollingIntervalMs);
     }

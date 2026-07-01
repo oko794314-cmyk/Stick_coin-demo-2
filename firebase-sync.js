@@ -145,6 +145,7 @@ function setupChatListener(currentUser, friendUsername) {
         const messages = snapshot.val() || [];
 
         if (typeof window.handleRealtimeChatSnapshot === 'function') {
+            // Якщо UI зареєстрував власний обробник, передаємо дані й не дублюємо локальний рендер тут.
             window.handleRealtimeChatSnapshot(friendUsername, messages);
             return;
         }
