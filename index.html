@@ -435,9 +435,9 @@
             <span><b id="shop-balance" style="color:var(--g); font-size:16px;">0.0000</b> <span style="font-size:10px; color:#555;">BB</span></span>
         </div>
         <div class="shop-cat-bar">
-            <button class="shop-cat-btn active" onclick="shopSwitchCat('frames')">🖼️ Рамки</button>
-            <button class="shop-cat-btn" onclick="shopSwitchCat('wallpapers')">🌌 Шпалери</button>
-            <button class="shop-cat-btn" onclick="shopSwitchCat('misc')">🎁 Інше</button>
+            <button class="shop-cat-btn active" data-cat="frames" onclick="shopSwitchCat('frames')">🖼️ Рамки</button>
+            <button class="shop-cat-btn" data-cat="wallpapers" onclick="shopSwitchCat('wallpapers')">🌌 Шпалери</button>
+            <button class="shop-cat-btn" data-cat="misc" onclick="shopSwitchCat('misc')">🎁 Інше</button>
         </div>
         <div id="shop-grid" class="shop-grid"></div>
     </div>
@@ -1948,10 +1948,9 @@
 
     function shopSwitchCat(cat) {
         shopState.activeCat = cat;
+        // Use data-cat attribute for reliable category matching
         document.querySelectorAll('.shop-cat-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.textContent.includes(
-                cat === 'frames' ? 'Рамки' : cat === 'wallpapers' ? 'Шпалери' : 'Інше'
-            ));
+            btn.classList.toggle('active', btn.dataset.cat === cat);
         });
         shopRender();
     }
