@@ -18,7 +18,10 @@ let firebaseState = {
     gameInvitationListeners: {},
     balanceListeners: {},
     onlineListeners: {},
-    typingListeners: {}
+    typingListeners: {},
+    rpsMatchListeners: {},
+    rpsMatchIdListeners: {},
+    rpsOutgoingListeners: {}
 };
 
 /**
@@ -666,6 +669,303 @@ function setupAllListenersOnLogin(currentUser) {
 }
 
 /**
+ * ✊ ВІДПРАВИТИ ЗАПРОШЕННЯ НА КНП ONLINE
+ */
+async function sendRpsInvitationFirebase(fromUser, toUser, bet) {
+    try {
+        const db = firebase.database();
+        const inviteId = Date.now().toString();
+
+        const invitation = {
+            id: inviteId,
+            from: fromUser,
+            to: toUser,
+            bet: bet,
+            gameType: 'rps',
+            status: 'pending',
+            notified: false,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        const updates = {};
+        updates[`users/${toUser}/gameInvitations/${inviteId}`] = invitation;
+        updates[`users/${fromUser}/outgoingRpsInvite`] = {
+            inviteId,
+            to: toUser,
+            bet,
+            status: 'pending',
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+        };
+
+        await db.ref().update(updates);
+
+        console.log(`✊ RPS запрошення від ${fromUser} до ${toUser} (ставка: ${bet})`);
+        updateSyncIndicator(true);
+        return { success: true, inviteId };
+
+    } catch (error) {
+        console.error('❌ Помилка надіслання RPS запрошення:', error);
+        updateSyncIndicator(false);
+        return { success: false };
+    }
+}
+
+/**
+ * ✅ ПРИЙНЯТИ RPS ЗАПРОШЕННЯ (Player B)
+ * Деблокує ставки і створює матч.
+ */
+async function acceptRpsInvitationFirebase(currentUser, invite) {
+    try {
+        const db = firebase.database();
+
+        if (!invite || !invite.from || !invite.id) throw new Error('Невалідне запрошення');
+        if (invite.from === currentUser) throw new Error('Не можна грати із собою');
+
+        const matchId = `rps_${invite.id}`;
+
+        // Load both users' data
+        const [p1Snap, p2Snap] = await Promise.all([
+            db.ref(`users/${invite.from}`).once('value'),
+            db.ref(`users/${currentUser}`).once('value')
+        ]);
+
+        const p1Data = p1Snap.val();
+        const p2Data = p2Snap.val();
+
+        if (!p1Data || !p2Data) throw new Error('Користувача не знайдено');
+
+        const bet = Number(invite.bet);
+        if (!bet || bet <= 0) throw new Error('Невалідна ставка');
+
+        if ((p1Data.balance || 0) < bet) throw new Error(`${invite.from} не має достатньо коштів`);
+        if ((p2Data.balance || 0) < bet) throw new Error('У вас недостатньо коштів');
+
+        // Check invite is still pending (not expired or already used)
+        const inviteSnap = await db.ref(`users/${currentUser}/gameInvitations/${invite.id}`).once('value');
+        const currentInvite = inviteSnap.val();
+        if (!currentInvite || currentInvite.status !== 'pending') {
+            throw new Error('Запрошення вже недійсне або прийняте');
+        }
+
+        // Deduct bets and create match atomically
+        const updates = {};
+        updates[`rpsMatches/${matchId}`] = {
+            id: matchId,
+            player1: invite.from,
+            player2: currentUser,
+            bet,
+            status: 'active',
+            choice1: null,
+            choice2: null,
+            winner: null,
+            createdAt: firebase.database.ServerValue.TIMESTAMP,
+            completedAt: null
+        };
+        updates[`users/${invite.from}/balance`]     = (p1Data.balance || 0) - bet;
+        updates[`users/${currentUser}/balance`]     = (p2Data.balance || 0) - bet;
+        updates[`users/${invite.from}/activeRpsMatchId`]    = matchId;
+        updates[`users/${currentUser}/activeRpsMatchId`]    = matchId;
+        updates[`users/${invite.from}/outgoingRpsInvite/status`]  = 'accepted';
+        updates[`users/${invite.from}/outgoingRpsInvite/matchId`] = matchId;
+        updates[`users/${currentUser}/gameInvitations/${invite.id}/status`] = 'accepted';
+
+        await db.ref().update(updates);
+
+        console.log(`✅ RPS матч створено: ${matchId}`);
+        updateSyncIndicator(true);
+        return { success: true, matchId };
+
+    } catch (error) {
+        console.error('❌ Помилка прийняття RPS запрошення:', error);
+        updateSyncIndicator(false);
+        return { success: false, error: error.message };
+    }
+}
+
+/**
+ * ❌ ВІДХИЛИТИ RPS ЗАПРОШЕННЯ
+ */
+async function rejectRpsInvitationFirebase(currentUser, invite) {
+    try {
+        if (!invite || !invite.id) return false;
+        const db = firebase.database();
+        const updates = {};
+        updates[`users/${currentUser}/gameInvitations/${invite.id}/status`] = 'rejected';
+        if (invite.from) {
+            updates[`users/${invite.from}/outgoingRpsInvite/status`] = 'rejected';
+        }
+        await db.ref().update(updates);
+        console.log(`❌ RPS запрошення відхилено: ${invite.id}`);
+        updateSyncIndicator(true);
+        return true;
+    } catch (error) {
+        console.error('❌ Помилка відхилення RPS запрошення:', error);
+        updateSyncIndicator(false);
+        return false;
+    }
+}
+
+/**
+ * ✊ ЗРОБИТИ ВИБІР У RPS ONLINE
+ */
+async function submitRpsChoiceFirebase(matchId, playerNum, choice) {
+    try {
+        const db = firebase.database();
+        const choiceField = playerNum === 1 ? 'choice1' : 'choice2';
+
+        // Write choice
+        await db.ref(`rpsMatches/${matchId}/${choiceField}`).set(choice);
+
+        // Try to resolve if both have chosen
+        const matchSnap = await db.ref(`rpsMatches/${matchId}`).once('value');
+        const match = matchSnap.val();
+        if (match && match.choice1 && match.choice2 && match.status === 'active') {
+            await resolveRpsMatchFirebase(matchId);
+        }
+
+        updateSyncIndicator(true);
+        return true;
+    } catch (error) {
+        console.error('❌ Помилка подачі вибору RPS:', error);
+        updateSyncIndicator(false);
+        return false;
+    }
+}
+
+/**
+ * 🏆 ВИРІШИТИ RPS МАТЧ (транзакція + виплата)
+ */
+async function resolveRpsMatchFirebase(matchId) {
+    try {
+        const db = firebase.database();
+        const matchRef = db.ref(`rpsMatches/${matchId}`);
+
+        let finalMatch = null;
+
+        // Use transaction to safely mark as completed (prevents double-resolution)
+        const txResult = await matchRef.transaction((match) => {
+            if (!match || match.status !== 'active') return; // abort
+            if (!match.choice1 || !match.choice2) return; // abort
+
+            const c1 = match.choice1;
+            const c2 = match.choice2;
+            let winner;
+            if (c1 === c2) {
+                winner = 'draw';
+            } else if (
+                (c1 === 'rock' && c2 === 'scissors') ||
+                (c1 === 'scissors' && c2 === 'paper') ||
+                (c1 === 'paper' && c2 === 'rock')
+            ) {
+                winner = 'player1';
+            } else {
+                winner = 'player2';
+            }
+
+            finalMatch = { ...match, status: 'completed', winner, completedAt: Date.now() };
+            return finalMatch;
+        });
+
+        if (!txResult.committed || !finalMatch) {
+            // Transaction aborted — already resolved by the other client, that's OK
+            return true;
+        }
+
+        // Pay out balances
+        const bet = finalMatch.bet;
+        const [p1Snap, p2Snap] = await Promise.all([
+            db.ref(`users/${finalMatch.player1}/balance`).once('value'),
+            db.ref(`users/${finalMatch.player2}/balance`).once('value')
+        ]);
+
+        const p1Bal = p1Snap.val() || 0;
+        const p2Bal = p2Snap.val() || 0;
+
+        const balUpdates = {};
+        if (finalMatch.winner === 'player1') {
+            balUpdates[`users/${finalMatch.player1}/balance`] = p1Bal + bet * 2;
+        } else if (finalMatch.winner === 'player2') {
+            balUpdates[`users/${finalMatch.player2}/balance`] = p2Bal + bet * 2;
+        } else {
+            // Draw — return bets to both
+            balUpdates[`users/${finalMatch.player1}/balance`] = p1Bal + bet;
+            balUpdates[`users/${finalMatch.player2}/balance`] = p2Bal + bet;
+        }
+
+        await db.ref().update(balUpdates);
+        console.log(`🏆 RPS матч ${matchId} завершено. Переможець: ${finalMatch.winner}`);
+        updateSyncIndicator(true);
+        return true;
+
+    } catch (error) {
+        console.error('❌ Помилка вирішення RPS матчу:', error);
+        updateSyncIndicator(false);
+        return false;
+    }
+}
+
+/**
+ * 🎮 СЛУХАЧ RPS МАТЧУ
+ */
+function setupRpsMatchListener(matchId, callback) {
+    const db = firebase.database();
+    const ref = db.ref(`rpsMatches/${matchId}`);
+
+    if (firebaseState.rpsMatchListeners[matchId]) {
+        ref.off('value', firebaseState.rpsMatchListeners[matchId]);
+    }
+
+    const listener = ref.on('value', (snapshot) => {
+        if (callback) callback(snapshot.val());
+    }, (error) => {
+        console.warn('⚠️ Помилка слухача RPS матчу:', error);
+    });
+
+    firebaseState.rpsMatchListeners[matchId] = listener;
+}
+
+/**
+ * 📬 СЛУХАЧ ACTIVE RPS MATCH ID (для Player A — щоб дізнатися matchId після accept)
+ */
+function setupRpsMatchIdListener(currentUser, callback) {
+    const db = firebase.database();
+    const ref = db.ref(`users/${currentUser}/activeRpsMatchId`);
+
+    if (firebaseState.rpsMatchIdListeners[currentUser]) {
+        ref.off('value', firebaseState.rpsMatchIdListeners[currentUser]);
+    }
+
+    const listener = ref.on('value', (snapshot) => {
+        if (callback) callback(snapshot.val());
+    }, (error) => {
+        console.warn('⚠️ Помилка слухача RPS matchId:', error);
+    });
+
+    firebaseState.rpsMatchIdListeners[currentUser] = listener;
+}
+
+/**
+ * 📤 СЛУХАЧ ВІДПОВІДІ НА ВІДІСЛАНЕ RPS ЗАПРОШЕННЯ
+ */
+function setupRpsOutgoingInviteListener(currentUser, callback) {
+    const db = firebase.database();
+    const ref = db.ref(`users/${currentUser}/outgoingRpsInvite`);
+
+    if (firebaseState.rpsOutgoingListeners[currentUser]) {
+        ref.off('value', firebaseState.rpsOutgoingListeners[currentUser]);
+    }
+
+    const listener = ref.on('value', (snapshot) => {
+        if (callback) callback(snapshot.val());
+    }, (error) => {
+        console.warn('⚠️ Помилка слухача outgoing RPS invite:', error);
+    });
+
+    firebaseState.rpsOutgoingListeners[currentUser] = listener;
+    return listener;
+}
+
+/**
  * 🧹 ВИДАЛИТИ ВСІ СЛУХАЧІ
  */
 function removeAllListeners() {
@@ -694,6 +994,18 @@ function removeAllListeners() {
     Object.keys(firebaseState.typingListeners).forEach(chatKey => {
         db.ref(`chats/${chatKey}/typing`).off();
     });
+
+    Object.keys(firebaseState.rpsMatchListeners || {}).forEach(matchId => {
+        db.ref(`rpsMatches/${matchId}`).off('value', firebaseState.rpsMatchListeners[matchId]);
+    });
+
+    Object.keys(firebaseState.rpsMatchIdListeners || {}).forEach(user => {
+        db.ref(`users/${user}/activeRpsMatchId`).off('value', firebaseState.rpsMatchIdListeners[user]);
+    });
+
+    Object.keys(firebaseState.rpsOutgoingListeners || {}).forEach(user => {
+        db.ref(`users/${user}/outgoingRpsInvite`).off('value', firebaseState.rpsOutgoingListeners[user]);
+    });
     
     firebaseState.friendRequestListeners = {};
     firebaseState.gameInvitationListeners = {};
@@ -701,6 +1013,9 @@ function removeAllListeners() {
     firebaseState.balanceListeners = {};
     firebaseState.onlineListeners = {};
     firebaseState.typingListeners = {};
+    firebaseState.rpsMatchListeners = {};
+    firebaseState.rpsMatchIdListeners = {};
+    firebaseState.rpsOutgoingListeners = {};
     
     console.log('🧹 Всі слухачі видалені');
 }
@@ -746,5 +1061,14 @@ window.removeTypingListener = removeTypingListener;
 window.setupAllListenersOnLogin = setupAllListenersOnLogin;
 window.removeAllListeners = removeAllListeners;
 window.getFirebaseStatus = getFirebaseStatus;
+// RPS Online
+window.sendRpsInvitationFirebase = sendRpsInvitationFirebase;
+window.acceptRpsInvitationFirebase = acceptRpsInvitationFirebase;
+window.rejectRpsInvitationFirebase = rejectRpsInvitationFirebase;
+window.submitRpsChoiceFirebase = submitRpsChoiceFirebase;
+window.resolveRpsMatchFirebase = resolveRpsMatchFirebase;
+window.setupRpsMatchListener = setupRpsMatchListener;
+window.setupRpsMatchIdListener = setupRpsMatchIdListener;
+window.setupRpsOutgoingInviteListener = setupRpsOutgoingInviteListener;
 
 console.log('✅ firebase-sync.js завантажено');
