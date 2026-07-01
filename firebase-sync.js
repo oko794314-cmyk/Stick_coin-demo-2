@@ -143,10 +143,13 @@ function setupChatListener(currentUser, friendUsername) {
     
     const listener = ref.on('value', (snapshot) => {
         const messages = snapshot.val() || [];
+        const realtimeHandler = window.stickChatRealtime && typeof window.stickChatRealtime.handleSnapshot === 'function'
+            ? window.stickChatRealtime.handleSnapshot
+            : (typeof window.handleRealtimeChatSnapshot === 'function' ? window.handleRealtimeChatSnapshot : null);
 
-        if (typeof window.handleRealtimeChatSnapshot === 'function') {
+        if (realtimeHandler) {
             // Якщо UI зареєстрував власний обробник, передаємо дані й не дублюємо локальний рендер тут.
-            window.handleRealtimeChatSnapshot(friendUsername, messages);
+            realtimeHandler(friendUsername, messages);
             return;
         }
         
