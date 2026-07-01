@@ -98,7 +98,7 @@
         .chat-row.own .chat-msg { background: rgba(7, 255, 255, 0.15); border-color: rgba(7, 255, 255, 0.25); border-bottom-right-radius: 5px; }
         .chat-row.other .chat-msg { background: rgba(0, 255, 136, 0.1); border-color: rgba(0, 255, 136, 0.2); border-bottom-left-radius: 5px; }
         .chat-meta { display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:9px; color:#90a4ae; margin-bottom:4px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .chat-input-wrap { display:flex; gap:8px; position: sticky; bottom: 6px; padding: 8px; border-radius: 12px; background: linear-gradient(180deg, rgba(3, 3, 3, 0), rgba(3, 3, 3, 0.92) 42%); backdrop-filter: blur(2px); z-index: 2; }
+        .chat-input-wrap { display:flex; gap:8px; position: sticky; bottom: 20px; padding: 8px; border-radius: 12px; background: linear-gradient(180deg, rgba(3, 3, 3, 0), rgba(3, 3, 3, 0.92) 42%); backdrop-filter: blur(2px); z-index: 2; }
         .chat-input-wrap .btn { margin: 0; width: 78px; }
 
         .internet-check { position: fixed; top: 10px; right: 10px; z-index: 999; padding: 10px 15px; border-radius: 20px; font-size: 11px; display: none; }
@@ -119,8 +119,25 @@
             input, select, .btn { padding: 11px; font-size: 13px; }
             .orb { width: 140px; height: 140px; font-size: 14px; }
             .chat-msg { max-width: 86%; }
-            .chat-input-wrap { bottom: 10px; }
+            .chat-input-wrap { bottom: 24px; }
         }
+
+        /* 🟢 Онлайн-статус */
+        .online-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--g); border: 2px solid var(--card); display: inline-block; flex-shrink: 0; box-shadow: 0 0 6px rgba(0, 255, 136, 0.7); }
+
+        /* 🔴 Лічильник непрочитаних */
+        .unread-badge { background: var(--r); color: #fff; border-radius: 50%; min-width: 20px; height: 20px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; padding: 0 3px; flex-shrink: 0; }
+
+        /* 🔔 Бейдж на таб навігації */
+        .tab-nav-badge { position: absolute; top: 3px; right: 8px; background: var(--r); color: #fff; border-radius: 50%; width: 14px; height: 14px; font-size: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; pointer-events: none; }
+
+        /* ✏️ Анімація набору тексту */
+        .typing-row { display: flex; align-items: flex-end; gap: 8px; margin-bottom: 6px; }
+        .typing-bubble { background: rgba(0, 255, 136, 0.1); border: 1px solid rgba(0, 255, 136, 0.2); border-radius: 14px; border-bottom-left-radius: 5px; padding: 10px 14px; display: flex; align-items: center; gap: 5px; }
+        .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--g); opacity: 0.7; animation: typingBounce 1.2s infinite ease-in-out; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.7; } 30% { transform: translateY(-7px); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -241,13 +258,24 @@
         <div class="chat-container">
             <div style="display:flex; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid #333;">
                 <span style="cursor:pointer; font-size:18px;" onclick="backToFriendsList()">◀ НАЗАД</span>
-                <div style="flex:1; margin-left:10px;">
+                <div style="flex:1; margin-left:10px; display:flex; align-items:center; gap:8px;">
                     <div id="chat-friend-name" style="font-weight:900; color:var(--p);">---</div>
+                    <span id="chat-online-dot" class="online-dot" style="display:none;" title="Онлайн"></span>
                 </div>
             </div>
             <div class="chat-messages" id="private-chat-messages"></div>
+            <div id="typing-indicator" style="display:none;">
+                <div class="typing-row">
+                    <span class="chat-avatar-wrap" aria-hidden="true"></span>
+                    <div class="typing-bubble">
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                        <span class="typing-dot"></span>
+                    </div>
+                </div>
+            </div>
             <div class="chat-input-wrap">
-                <input type="text" id="private-msg-in" placeholder="Повідомлення..." onkeypress="handlePrivateChatKeypress(event)">
+                <input type="text" id="private-msg-in" placeholder="Повідомлення..." onkeypress="handlePrivateChatKeypress(event)" oninput="handleChatInput()">
                 <button class="btn" onclick="sendPrivateMsg()">></button>
             </div>
         </div>
@@ -284,7 +312,7 @@
         <div class="tab active" onclick="switchTab(1)">⛏️<span>Mining</span></div>
         <div class="tab" onclick="switchTab(2)">💳<span>Transfer</span></div>
         <div class="tab" onclick="switchTab(3)">🎰<span>Casino</span></div>
-        <div class="tab" onclick="switchTab(4)">👥<span>Friends</span></div>
+        <div class="tab" id="friends-nav-tab" style="position:relative;" onclick="switchTab(4)">👥<span>Friends</span></div>
         <div class="tab" onclick="switchTab(5)">⚙️<span>Other</span></div>
     </nav>
 </div>
@@ -346,6 +374,7 @@
     let allUsers = {};
     let mineInterval = null;
     let pendingGameRequest = null;
+    let typingTimeout = null;
     const chatRealtimeBridge = {
         timer: null,
         activeChatFriend: null
@@ -366,7 +395,9 @@
         miningStartTime: 0,
         expandedFriendRequest: null,
         rouletteRotation: 0,
-        rouletteSpinning: false
+        rouletteSpinning: false,
+        unreadCounts: {},
+        friendsOnline: {}
     };
 
     // ===== ІНІЦІАЛІЗАЦІЯ =====
@@ -504,8 +535,21 @@
         if (gameState.chatMessageSignatures[friendUsername] === signature) {
             return false;
         }
+        const prevCount = (gameState.privateChatMessages[friendUsername] || []).length;
         gameState.privateChatMessages[friendUsername] = normalized;
         gameState.chatMessageSignatures[friendUsername] = signature;
+
+        // Track unread incoming messages when chat is not open
+        if (gameState.currentChatFriend !== friendUsername) {
+            const newMsgs = normalized.slice(Math.max(0, prevCount));
+            const unreadFromFriend = newMsgs.filter(m => m.from !== gameState.user).length;
+            if (unreadFromFriend > 0) {
+                gameState.unreadCounts[friendUsername] = (gameState.unreadCounts[friendUsername] || 0) + unreadFromFriend;
+                updateFriendsList();
+                updateChatTabBadge();
+            }
+        }
+
         if (gameState.currentChatFriend === friendUsername) {
             displayPrivateChat();
         }
@@ -695,6 +739,29 @@
             indicator.classList.add('active');
             setTimeout(() => indicator.classList.remove('active'), 500);
         }
+    }
+
+    function updateChatTabBadge() {
+        const total = Object.values(gameState.unreadCounts).reduce((s, n) => s + (n || 0), 0);
+        const tab = document.getElementById('friends-nav-tab');
+        if (!tab) return;
+        let badge = tab.querySelector('.tab-nav-badge');
+        if (total > 0) {
+            if (!badge) {
+                badge = document.createElement('div');
+                badge.className = 'tab-nav-badge';
+                tab.appendChild(badge);
+            }
+            badge.textContent = total > 9 ? '9+' : String(total);
+            badge.style.display = 'flex';
+        } else if (badge) {
+            badge.style.display = 'none';
+        }
+    }
+
+    function updateChatOnlineDot(isOnline) {
+        const dot = document.getElementById('chat-online-dot');
+        if (dot) dot.style.display = isOnline ? 'inline-block' : 'none';
     }
 
     function showGameNotification(message) {
@@ -999,15 +1066,22 @@
             item.className = 'friend-item';
             item.setAttribute('role', 'button');
             item.setAttribute('tabindex', '0');
+            const isOnline = gameState.friendsOnline[friend] === true;
+            const unread = gameState.unreadCounts[friend] || 0;
             item.innerHTML = `
                 <div class="friend-item-identity">
                     ${buildListAvatarHtml(friend)}
                     <div class="friend-item-main">
-                        <strong>${escapeHtml(formatUserLabel(friend))}</strong>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <strong>${escapeHtml(formatUserLabel(friend))}</strong>
+                            ${isOnline ? '<span class="online-dot" title="Онлайн"></span>' : ''}
+                        </div>
                         <span class="friend-item-subtitle">Натисніть, щоб відкрити чат</span>
                     </div>
                 </div>
-                <span aria-hidden="true">💬</span>
+                ${unread > 0
+                    ? `<span class="unread-badge" aria-label="${unread} непрочитаних">${unread > 9 ? '9+' : unread}</span>`
+                    : '<span aria-hidden="true">💬</span>'}
             `;
             item.addEventListener('click', () => openChat(friend));
             item.addEventListener('keypress', (event) => {
@@ -1022,6 +1096,10 @@
     }
 
     function openChat(friendUsername) {
+        // Clear unread count for this friend
+        gameState.unreadCounts[friendUsername] = 0;
+        updateChatTabBadge();
+
         gameState.currentChatFriend = friendUsername;
         startChatRealtimeBridge(gameState.user, friendUsername);
         setupChatListener(gameState.user, friendUsername);
@@ -1032,10 +1110,38 @@
         document.getElementById('chat-friend-name').textContent = formatUserLabel(friendUsername);
         const nav = document.querySelector('nav');
         if (nav) nav.style.display = 'none';
+
+        // Show online status in chat header
+        updateChatOnlineDot(gameState.friendsOnline[friendUsername] === true);
+
+        // Hide typing indicator when opening chat
+        const typingEl = document.getElementById('typing-indicator');
+        if (typingEl) typingEl.style.display = 'none';
+
+        // Setup typing listener for this friend
+        if (typeof setupTypingListener === 'function') {
+            setupTypingListener(gameState.user, friendUsername, (isTyping) => {
+                const el = document.getElementById('typing-indicator');
+                if (el) el.style.display = isTyping ? 'block' : 'none';
+            });
+        }
+
         displayPrivateChat();
     }
 
     function backToFriendsList() {
+        // Clear typing indicator and listener
+        if (gameState.currentChatFriend && gameState.user) {
+            if (typeof clearTypingIndicator === 'function') {
+                clearTypingIndicator(gameState.user, gameState.currentChatFriend);
+            }
+            if (typeof removeTypingListener === 'function') {
+                removeTypingListener(gameState.user, gameState.currentChatFriend);
+            }
+        }
+        clearTimeout(typingTimeout);
+        typingTimeout = null;
+
         stopChatRealtimeBridge();
         gameState.currentChatFriend = null;
         document.getElementById('private-msg-in').value = '';
@@ -1078,11 +1184,31 @@
         }
     }
 
+    function handleChatInput() {
+        if (!gameState.currentChatFriend || !gameState.user) return;
+        if (typeof sendTypingIndicator === 'function') {
+            sendTypingIndicator(gameState.user, gameState.currentChatFriend);
+        }
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            if (gameState.currentChatFriend && gameState.user && typeof clearTypingIndicator === 'function') {
+                clearTypingIndicator(gameState.user, gameState.currentChatFriend);
+            }
+        }, 3000);
+    }
+
     async function sendPrivateMsg() {
         const input = document.getElementById('private-msg-in');
         const message = input.value.trim();
 
         if (!message || !gameState.currentChatFriend) return;
+
+        // Clear typing on send
+        clearTimeout(typingTimeout);
+        typingTimeout = null;
+        if (typeof clearTypingIndicator === 'function') {
+            clearTypingIndicator(gameState.user, gameState.currentChatFriend);
+        }
 
         const success = await sendPrivateMessageFirebase(gameState.user, gameState.currentChatFriend, message);
         if (!success) {
@@ -1111,6 +1237,22 @@
         const requesterFriends = [...new Set([...(allUsers[requester]?.friends || []), gameState.user])];
         updateCachedUser(gameState.user, { friends: gameState.friends, friendRequests: gameState.friendRequests });
         updateCachedUser(requester, { friends: requesterFriends });
+
+        // Set up online listener for the new friend
+        if (typeof setupFriendOnlineListener === 'function') {
+            setupFriendOnlineListener(requester, (friendName, isOnline) => {
+                gameState.friendsOnline[friendName] = isOnline;
+                updateFriendsList();
+                if (gameState.currentChatFriend === friendName) {
+                    updateChatOnlineDot(isOnline);
+                }
+            });
+        }
+        // Set up chat listener for the new friend
+        if (typeof setupChatListener === 'function') {
+            setupChatListener(gameState.user, requester);
+        }
+
         updateFriendRequestsList();
         updateFriendsList();
         showGameNotification(`✅ ${formatUserLabel(requester)} додано в друзі`);
@@ -1280,6 +1422,18 @@
     }
 
     function logout() {
+        // Clear typing and set offline before cleanup
+        if (gameState.user) {
+            if (gameState.currentChatFriend && typeof clearTypingIndicator === 'function') {
+                clearTypingIndicator(gameState.user, gameState.currentChatFriend);
+            }
+            if (typeof setOffline === 'function') {
+                setOffline(gameState.user);
+            }
+        }
+        clearTimeout(typingTimeout);
+        typingTimeout = null;
+
         stopChatRealtimeBridge();
         removeAllListeners();
         gameState.user = null;
@@ -1292,6 +1446,8 @@
         gameState.chatMessageSignatures = {};
         gameState.currentChatFriend = null;
         gameState.expandedFriendRequest = null;
+        gameState.unreadCounts = {};
+        gameState.friendsOnline = {};
         allUsers = {};
         document.getElementById('main-scr').style.display = 'none';
         document.getElementById('auth-scr').style.display = 'flex';

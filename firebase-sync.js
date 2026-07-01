@@ -15,7 +15,10 @@ let firebaseState = {
     userListeners: {},
     chatListeners: {},
     friendRequestListeners: {},
-    gameInvitationListeners: {}
+    gameInvitationListeners: {},
+    balanceListeners: {},
+    onlineListeners: {},
+    typingListeners: {}
 };
 
 /**
@@ -455,13 +458,17 @@ async function transferCoinsFirebase(fromUser, toUser, amount) {
         await db.ref(`users/${fromUser}/balance`).set(fromData.balance);
         await db.ref(`users/${toUser}/balance`).set(toData.balance);
         
-        // Записати транзакцію в історію
-        await db.ref(`transactions`).push({
-            from: fromUser,
-            to: toUser,
-            amount: amount,
-            timestamp: firebase.database.ServerValue.TIMESTAMP
-        });
+        // Записати транзакцію в історію (non-critical — помилка не скасовує передачу)
+        try {
+            await db.ref(`transactions`).push({
+                from: fromUser,
+                to: toUser,
+                amount: amount,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+        } catch (txError) {
+            console.warn('⚠️ Помилка запису транзакції (передача все одно виконана):', txError);
+        }
         
         console.log(`💳 Передача ${amount} від ${fromUser} до ${toUser}`);
         updateSyncIndicator(true);
@@ -492,10 +499,144 @@ async function updateMiningBalanceFirebase(username, newBalance) {
 }
 
 /**
+ * 💰 СЛУХАЧ БАЛАНСУ - МИТТЄВЕ ОНОВЛЕННЯ UI
+ */
+function setupBalanceListener(currentUser) {
+    const db = firebase.database();
+    const ref = db.ref(`users/${currentUser}/balance`);
+
+    if (firebaseState.balanceListeners[currentUser]) {
+        ref.off('value', firebaseState.balanceListeners[currentUser]);
+    }
+
+    const listener = ref.on('value', (snapshot) => {
+        const newBalance = snapshot.val();
+        if (newBalance === null || typeof newBalance !== 'number') return;
+        if (newBalance !== gameState.balance) {
+            gameState.balance = newBalance;
+            if (typeof updateHeader === 'function') updateHeader();
+        }
+    }, (error) => {
+        console.warn('⚠️ Помилка слухача балансу:', error);
+    });
+
+    firebaseState.balanceListeners[currentUser] = listener;
+}
+
+/**
+ * 🟢 ВСТАНОВИТИ ОНЛАЙН-СТАТУС
+ */
+function setupOnlinePresence(currentUser) {
+    const db = firebase.database();
+    const onlineRef = db.ref(`users/${currentUser}/online`);
+    onlineRef.set(true);
+    onlineRef.onDisconnect().set(false);
+}
+
+/**
+ * 🔴 ВСТАНОВИТИ ОФЛАЙН-СТАТУС
+ */
+function setOffline(currentUser) {
+    try {
+        const db = firebase.database();
+        db.ref(`users/${currentUser}/online`).set(false);
+    } catch (error) {
+        console.warn('⚠️ Помилка встановлення офлайн:', error);
+    }
+}
+
+/**
+ * 👀 СЛУХАЧ ОНЛАЙН-СТАТУСУ ДРУГА
+ */
+function setupFriendOnlineListener(friendUsername, callback) {
+    const db = firebase.database();
+    const ref = db.ref(`users/${friendUsername}/online`);
+
+    if (firebaseState.onlineListeners[friendUsername]) {
+        ref.off('value', firebaseState.onlineListeners[friendUsername]);
+    }
+
+    const listener = ref.on('value', (snapshot) => {
+        const isOnline = snapshot.val() === true;
+        if (callback) callback(friendUsername, isOnline);
+    }, (error) => {
+        console.warn(`⚠️ Помилка слухача онлайн (${friendUsername}):`, error);
+    });
+
+    firebaseState.onlineListeners[friendUsername] = listener;
+}
+
+/**
+ * ✏️ НАДІСЛАТИ ІНДИКАТОР НАБОРУ
+ */
+function sendTypingIndicator(currentUser, friendUsername) {
+    try {
+        const db = firebase.database();
+        const chatKey = [currentUser, friendUsername].sort().join('_');
+        db.ref(`chats/${chatKey}/typing/${currentUser}`).set(true);
+    } catch (error) {
+        console.warn('⚠️ Помилка індикатора набору:', error);
+    }
+}
+
+/**
+ * ✏️ ЗНЯТИ ІНДИКАТОР НАБОРУ
+ */
+function clearTypingIndicator(currentUser, friendUsername) {
+    try {
+        const db = firebase.database();
+        const chatKey = [currentUser, friendUsername].sort().join('_');
+        db.ref(`chats/${chatKey}/typing/${currentUser}`).set(false);
+    } catch (error) {
+        console.warn('⚠️ Помилка зняття індикатора набору:', error);
+    }
+}
+
+/**
+ * 👁️ СЛУХАЧ ІНДИКАТОРА НАБОРУ
+ */
+function setupTypingListener(currentUser, friendUsername, callback) {
+    const db = firebase.database();
+    const chatKey = [currentUser, friendUsername].sort().join('_');
+    const ref = db.ref(`chats/${chatKey}/typing/${friendUsername}`);
+
+    if (firebaseState.typingListeners[chatKey]) {
+        db.ref(`chats/${chatKey}/typing/${friendUsername}`).off('value', firebaseState.typingListeners[chatKey]);
+    }
+
+    const listener = ref.on('value', (snapshot) => {
+        const isTyping = snapshot.val() === true;
+        if (callback) callback(isTyping);
+    }, (error) => {
+        console.warn(`⚠️ Помилка слухача набору (${friendUsername}):`, error);
+    });
+
+    firebaseState.typingListeners[chatKey] = listener;
+}
+
+/**
+ * 🔇 ЗНЯТИ СЛУХАЧ ІНДИКАТОРА НАБОРУ
+ */
+function removeTypingListener(currentUser, friendUsername) {
+    const db = firebase.database();
+    const chatKey = [currentUser, friendUsername].sort().join('_');
+    if (firebaseState.typingListeners[chatKey]) {
+        db.ref(`chats/${chatKey}/typing/${friendUsername}`).off('value', firebaseState.typingListeners[chatKey]);
+        delete firebaseState.typingListeners[chatKey];
+    }
+}
+
+/**
  * 🎯 НАЛАШТУВАННЯ СЛУХАЧІВ ПРИ ВХОДІ
  */
 function setupAllListenersOnLogin(currentUser) {
     console.log(`🔔 Налаштування слухачів для ${currentUser}...`);
+    
+    // Баланс — миттєве оновлення після передачі/майнингу
+    setupBalanceListener(currentUser);
+    
+    // Онлайн-присутність
+    setupOnlinePresence(currentUser);
     
     // Запити на дружбу
     setupFriendRequestListener(currentUser);
@@ -506,6 +647,19 @@ function setupAllListenersOnLogin(currentUser) {
     // Чати - налаштуються при вході у чат
     gameState.friends.forEach(friend => {
         setupChatListener(currentUser, friend);
+    });
+
+    // Онлайн-статус друзів
+    gameState.friends.forEach(friend => {
+        setupFriendOnlineListener(friend, (friendName, isOnline) => {
+            if (!gameState) return;
+            gameState.friendsOnline = gameState.friendsOnline || {};
+            gameState.friendsOnline[friendName] = isOnline;
+            if (typeof updateFriendsList === 'function') updateFriendsList();
+            if (gameState.currentChatFriend === friendName && typeof updateChatOnlineDot === 'function') {
+                updateChatOnlineDot(isOnline);
+            }
+        });
     });
     
     console.log(`✅ Всі слухачі налаштовані для ${currentUser}`);
@@ -528,10 +682,25 @@ function removeAllListeners() {
     Object.keys(firebaseState.chatListeners).forEach(chatKey => {
         db.ref(`chats/${chatKey}/messages`).off('value', firebaseState.chatListeners[chatKey]);
     });
+
+    Object.keys(firebaseState.balanceListeners).forEach(user => {
+        db.ref(`users/${user}/balance`).off('value', firebaseState.balanceListeners[user]);
+    });
+
+    Object.keys(firebaseState.onlineListeners).forEach(user => {
+        db.ref(`users/${user}/online`).off('value', firebaseState.onlineListeners[user]);
+    });
+
+    Object.keys(firebaseState.typingListeners).forEach(chatKey => {
+        db.ref(`chats/${chatKey}/typing`).off();
+    });
     
     firebaseState.friendRequestListeners = {};
     firebaseState.gameInvitationListeners = {};
     firebaseState.chatListeners = {};
+    firebaseState.balanceListeners = {};
+    firebaseState.onlineListeners = {};
+    firebaseState.typingListeners = {};
     
     console.log('🧹 Всі слухачі видалені');
 }
@@ -566,6 +735,14 @@ window.updateUserPasswordFirebase = updateUserPasswordFirebase;
 window.sendGameInvitationFirebase = sendGameInvitationFirebase;
 window.transferCoinsFirebase = transferCoinsFirebase;
 window.updateMiningBalanceFirebase = updateMiningBalanceFirebase;
+window.setupBalanceListener = setupBalanceListener;
+window.setupOnlinePresence = setupOnlinePresence;
+window.setOffline = setOffline;
+window.setupFriendOnlineListener = setupFriendOnlineListener;
+window.sendTypingIndicator = sendTypingIndicator;
+window.clearTypingIndicator = clearTypingIndicator;
+window.setupTypingListener = setupTypingListener;
+window.removeTypingListener = removeTypingListener;
 window.setupAllListenersOnLogin = setupAllListenersOnLogin;
 window.removeAllListeners = removeAllListeners;
 window.getFirebaseStatus = getFirebaseStatus;
