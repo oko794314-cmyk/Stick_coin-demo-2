@@ -541,7 +541,7 @@
 
         // Track unread incoming messages when chat is not open
         if (gameState.currentChatFriend !== friendUsername) {
-            const newMsgs = normalized.slice(prevCount);
+            const newMsgs = normalized.slice(Math.max(0, prevCount));
             const unreadFromFriend = newMsgs.filter(m => m.from !== gameState.user).length;
             if (unreadFromFriend > 0) {
                 gameState.unreadCounts[friendUsername] = (gameState.unreadCounts[friendUsername] || 0) + unreadFromFriend;
