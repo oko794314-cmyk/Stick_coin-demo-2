@@ -47,8 +47,8 @@
         .c { aspect-ratio: 1; background: #000; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 8px; cursor: pointer; }
         .c:hover { border-color: var(--p); transform: scale(1.05); box-shadow: 0 0 10px rgba(7, 255, 255, 0.3); }
 
-        nav { position: fixed; bottom: 0; width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); background: #000; border-top: 1px solid #111; padding: 10px 0 var(--app-nav-safe-bottom); z-index: 50; box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.6); }
-        .tab { text-align: center; color: #444; font-size: 22px; cursor: pointer; transition: all 0.3s; }
+        nav { position: fixed; bottom: 0; width: 100%; display: grid; grid-template-columns: repeat(6, 1fr); background: #000; border-top: 1px solid #111; padding: 10px 0 var(--app-nav-safe-bottom); z-index: 50; box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.6); }
+        .tab { text-align: center; color: #444; font-size: 18px; cursor: pointer; transition: all 0.3s; }
         .tab.active { color: var(--p); animation: tabPulse 0.5s ease; }
         @keyframes tabPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         .tab span { display: block; font-size: 8px; text-transform: uppercase; margin-top: 4px; }
@@ -138,6 +138,35 @@
         .typing-dot:nth-child(2) { animation-delay: 0.2s; }
         .typing-dot:nth-child(3) { animation-delay: 0.4s; }
         @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.7; } 30% { transform: translateY(-7px); opacity: 1; } }
+
+        /* ✊ Казино: підвкладки */
+        .casino-subtabs { display:flex; border-bottom:1px solid #222; margin-bottom:15px; }
+        .casino-subtab { padding:8px 14px; font-size:10px; color:#555; cursor:pointer; border-bottom:2px solid transparent; transition:0.2s; text-transform:uppercase; letter-spacing:1px; }
+        .casino-subtab.active { color:var(--p); border-bottom-color:var(--p); }
+
+        /* ✊ RPS гра */
+        .rps-balance-row { display:flex; justify-content:space-between; font-size:11px; padding:3px 0; }
+        .rps-choice-btn { background:#111; border:2px solid #333; color:#fff; padding:12px 8px; border-radius:12px; cursor:pointer; font-size:1.6rem; min-width:72px; transition:all 0.2s; font-family:'Orbitron',sans-serif; flex:1; }
+        .rps-choice-btn:hover { border-color:var(--p); transform:scale(1.05); }
+        .rps-choice-btn:disabled { opacity:0.35; cursor:not-allowed; transform:none; }
+        .rps-choice-row { display:flex; gap:8px; justify-content:center; margin-top:15px; }
+
+        /* 🛍️ Магазин */
+        .shop-cat-bar { display:flex; gap:8px; margin-bottom:15px; overflow-x:auto; padding-bottom:4px; }
+        .shop-cat-btn { padding:7px 14px; border-radius:20px; font-size:10px; cursor:pointer; border:1px solid #333; background:#000; color:#555; white-space:nowrap; font-family:'Orbitron',sans-serif; transition:0.2s; }
+        .shop-cat-btn.active { background:var(--p); color:#000; border-color:var(--p); }
+        .shop-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+        .shop-item { background:var(--card); border:1px solid #222; border-radius:12px; padding:14px; text-align:center; transition:0.2s; }
+        .shop-item.owned { border-color:rgba(0,255,136,0.5); }
+        .shop-item.equipped { border-color:var(--gold); box-shadow:0 0 10px rgba(255,204,0,0.2); }
+        .shop-item-preview { font-size:2.4rem; margin-bottom:8px; }
+        .shop-item-name { font-size:10px; font-weight:900; margin-bottom:3px; line-height:1.3; }
+        .shop-item-price { font-size:10px; color:var(--gold); margin-bottom:8px; }
+        .shop-item-btn { width:100%; padding:7px; border:none; border-radius:7px; font-size:9px; font-weight:900; cursor:pointer; background:var(--p); color:#000; font-family:'Orbitron',sans-serif; transition:0.2s; }
+        .shop-item-btn.equip-btn { background:#1a1a1a; color:var(--gold); border:1px solid var(--gold); }
+        .shop-item-btn.equipped-btn { background:rgba(255,204,0,0.12); color:var(--gold); border:1px solid var(--gold); }
+        .shop-item-btn.owned-misc-btn { background:#1a1a1a; color:var(--g); border:1px solid var(--g); cursor:default; }
+        .shop-item-btn:disabled { opacity:0.4; cursor:not-allowed; }
     </style>
 </head>
 <body>
@@ -221,19 +250,110 @@
     <!-- ВКЛ.3: КАЗИНО -->
     <div id="tab3" class="view">
         <h3 style="margin-top:0;">🎰 CASINO</h3>
-        <div class="glass" style="text-align:center;">
-            <p style="margin:0 0 10px; font-size:12px; color:#555;">РУЛЕТКА</p>
-            <div class="r-wrap">
-                <div class="roulette-pointer" aria-hidden="true"></div>
-                <div id="wheel" class="r-box"></div>
-                <div class="roulette-center" aria-hidden="true"></div>
+
+        <!-- Підвкладки казино -->
+        <div class="casino-subtabs">
+            <div class="casino-subtab active" onclick="switchCasinoTab('roulette')" id="cs-roulette">🎡 Рулетка</div>
+            <div class="casino-subtab" onclick="switchCasinoTab('rps')" id="cs-rps">✊ КНП (PvP)</div>
+        </div>
+
+        <!-- Рулетка -->
+        <div id="casino-roulette">
+            <div class="glass" style="text-align:center;">
+                <p style="margin:0 0 10px; font-size:12px; color:#555;">РУЛЕТКА</p>
+                <div class="r-wrap">
+                    <div class="roulette-pointer" aria-hidden="true"></div>
+                    <div id="wheel" class="r-box"></div>
+                    <div class="roulette-center" aria-hidden="true"></div>
+                </div>
+                <input type="number" id="bet-amt" placeholder="СТАВКА" min="0.0001" step="0.0001">
+                <div style="display:flex; gap:5px; margin-top:10px;">
+                    <button class="btn" onclick="spin('red')" style="flex:1; background:#1a1a1a; border:2px solid #ff3366; color:#ff3366;">🔴 RED (x2)</button>
+                    <button class="btn" onclick="spin('green')" style="flex:1; background:#1a1a1a; border:2px solid #00ff88; color:#00ff88;">🟢 GREEN 0 (x14)</button>
+                    <button class="btn" onclick="spin('black')" style="flex:1; background:#1a1a1a; border:2px solid #333;">⬛ BLACK (x2)</button>
+                </div>
             </div>
-            <input type="number" id="bet-amt" placeholder="СТАВКА" min="0.0001" step="0.0001">
-            <div style="display:flex; gap:5px; margin-top:10px;">
-                <button class="btn" onclick="spin('red')" style="flex:1; background:#1a1a1a; border:2px solid #ff3366; color:#ff3366;">🔴 RED (x2)</button>
-                <button class="btn" onclick="spin('green')" style="flex:1; background:#1a1a1a; border:2px solid #00ff88; color:#00ff88;">🟢 GREEN 0 (x14)</button>
-                <button class="btn" onclick="spin('black')" style="flex:1; background:#1a1a1a; border:2px solid #333;">⬛ BLACK (x2)</button>
+        </div>
+
+        <!-- Камінь Ножиці Папір -->
+        <div id="casino-rps" style="display:none;">
+
+            <!-- Фаза 1: Ставки -->
+            <div id="rps-phase-betting">
+                <div class="glass">
+                    <p style="text-align:center; font-size:10px; color:var(--p); letter-spacing:2px; margin:0 0 8px;">ГРАВЕЦЬ 1</p>
+                    <div class="rps-balance-row">
+                        <span style="color:#888;" id="rps-p1-name-lbl">Гравець 1</span>
+                        <span>Баланс: <b id="rps-p1-bal" style="color:var(--g);">100.00</b></span>
+                    </div>
+                    <input type="number" id="rps-bet1" placeholder="СТАВКА ГРАВЦЯ 1" min="0.01" step="0.01">
+                    <button id="rps-confirm1-btn" class="btn" onclick="rpsConfirmBet(1)" style="margin-top:8px; padding:10px;">✓ ПІДТВЕРДИТИ</button>
+                </div>
+                <div class="glass">
+                    <p style="text-align:center; font-size:10px; color:var(--r); letter-spacing:2px; margin:0 0 8px;">ГРАВЕЦЬ 2</p>
+                    <div class="rps-balance-row">
+                        <span style="color:#888;" id="rps-p2-name-lbl">Гравець 2</span>
+                        <span>Баланс: <b id="rps-p2-bal" style="color:var(--g);">100.00</b></span>
+                    </div>
+                    <input type="number" id="rps-bet2" placeholder="СТАВКА ГРАВЦЯ 2" min="0.01" step="0.01">
+                    <button id="rps-confirm2-btn" class="btn" onclick="rpsConfirmBet(2)" style="margin-top:8px; padding:10px; background:#1a1a1a; border:2px solid var(--r); color:var(--r);">✓ ПІДТВЕРДИТИ</button>
+                </div>
+                <div style="text-align:center; font-size:10px; color:#555; margin-bottom:8px;" id="rps-pot-display"></div>
+                <button id="rps-start-btn" class="btn" onclick="rpsStartRound()" disabled style="background:#222; color:#555; cursor:not-allowed;">▶ ПОЧАТИ МАТЧ</button>
             </div>
+
+            <!-- Фаза 2: Вибір (Гравець 1 або Гравець 2) -->
+            <div id="rps-phase-choose" style="display:none;">
+                <div class="glass" style="text-align:center;">
+                    <div id="rps-round-label" style="color:var(--gold); font-size:11px; letter-spacing:2px; margin-bottom:5px;">РАУНД 1</div>
+                    <div id="rps-turn-label" style="color:var(--p); font-size:14px; font-weight:900; margin-bottom:6px;">ХІД: ГРАВЕЦЬ 1</div>
+                    <div style="font-size:10px; color:#555; margin-bottom:14px;">Інший гравець — відвернись!</div>
+                    <div id="rps-countdown" style="font-size:5rem; font-weight:900; color:var(--r); line-height:1; margin:8px 0;">3</div>
+                    <div class="rps-choice-row">
+                        <button class="rps-choice-btn" onclick="rpsChoose('rock')">✊<br><small style="font-size:8px;">КАМІНЬ</small></button>
+                        <button class="rps-choice-btn" onclick="rpsChoose('scissors')">✌️<br><small style="font-size:8px;">НОЖИЦІ</small></button>
+                        <button class="rps-choice-btn" onclick="rpsChoose('paper')">🖐️<br><small style="font-size:8px;">ПАПІР</small></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Фаза 2.5: Передача пристрою -->
+            <div id="rps-phase-handoff" style="display:none;">
+                <div class="glass" style="text-align:center; padding:30px 15px;">
+                    <div style="font-size:3rem; margin-bottom:12px;">📱</div>
+                    <div style="font-size:13px; font-weight:900; color:var(--gold); margin-bottom:8px;">Вибір зроблено!</div>
+                    <div id="rps-handoff-msg" style="font-size:11px; color:#aaa; margin-bottom:20px;">Передайте пристрій Гравцю 2!</div>
+                    <button class="btn" onclick="rpsHandoffReady()">ГОТОВО →</button>
+                </div>
+            </div>
+
+            <!-- Фаза 3: Розкриття результату -->
+            <div id="rps-phase-reveal" style="display:none;">
+                <div class="glass" style="text-align:center;">
+                    <div id="rps-reveal-round" style="font-size:10px; color:#555; letter-spacing:2px; margin-bottom:14px;">РАУНД 1 — РЕЗУЛЬТАТ</div>
+                    <div style="display:flex; justify-content:space-around; align-items:center; margin:10px 0;">
+                        <div>
+                            <div id="rps-p1-reveal-icon" style="font-size:3.5rem;">✊</div>
+                            <div id="rps-p1-reveal-name" style="font-size:10px; color:#888; margin-top:5px;">Гравець 1</div>
+                            <div id="rps-p1-reveal-choice" style="font-size:9px; color:#555;"></div>
+                        </div>
+                        <div style="font-size:1.4rem; color:#333; font-weight:900;">VS</div>
+                        <div>
+                            <div id="rps-p2-reveal-icon" style="font-size:3.5rem;">✌️</div>
+                            <div id="rps-p2-reveal-name" style="font-size:10px; color:#888; margin-top:5px;">Гравець 2</div>
+                            <div id="rps-p2-reveal-choice" style="font-size:9px; color:#555;"></div>
+                        </div>
+                    </div>
+                    <div id="rps-round-result" style="font-size:13px; font-weight:900; padding:12px; border-radius:8px; margin:10px 0;"></div>
+                    <div style="display:flex; flex-direction:column; gap:8px; margin-top:10px;">
+                        <button id="rps-next-btn" class="btn" onclick="rpsNextRound()" style="display:none; background:var(--gold); color:#000;">▶ НАСТУПНИЙ РАУНД</button>
+                        <button id="rps-finish-btn" class="btn" onclick="rpsFinish()" style="display:none; background:var(--g); color:#000;">🏆 ЗАВЕРШИТИ ТА ОНОВИТИ БАЛАНС</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопка скидання -->
+            <button class="btn" onclick="rpsReset(true)" style="background:#0d0d0d; color:#555; border:1px solid #222; margin-top:8px; font-size:11px;">↺ СКИНУТИ / НОВИЙ МАТ</button>
         </div>
     </div>
 
@@ -307,6 +427,21 @@
         </div>
     </div>
 
+    <!-- ВКЛ.6: МАГАЗИН -->
+    <div id="tab6" class="view">
+        <h3 style="margin-top:0;">🛍️ МАГАЗИН</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-size:10px; color:#555;">ВАШ БАЛАНС:</span>
+            <span><b id="shop-balance" style="color:var(--g); font-size:16px;">0.0000</b> <span style="font-size:10px; color:#555;">BB</span></span>
+        </div>
+        <div class="shop-cat-bar">
+            <button class="shop-cat-btn active" data-cat="frames" onclick="shopSwitchCat('frames')">🖼️ Рамки</button>
+            <button class="shop-cat-btn" data-cat="wallpapers" onclick="shopSwitchCat('wallpapers')">🌌 Шпалери</button>
+            <button class="shop-cat-btn" data-cat="misc" onclick="shopSwitchCat('misc')">🎁 Інше</button>
+        </div>
+        <div id="shop-grid" class="shop-grid"></div>
+    </div>
+
     <!-- НАВІГАЦІЯ -->
     <nav>
         <div class="tab active" onclick="switchTab(1)">⛏️<span>Mining</span></div>
@@ -314,6 +449,7 @@
         <div class="tab" onclick="switchTab(3)">🎰<span>Casino</span></div>
         <div class="tab" id="friends-nav-tab" style="position:relative;" onclick="switchTab(4)">👥<span>Friends</span></div>
         <div class="tab" onclick="switchTab(5)">⚙️<span>Other</span></div>
+        <div class="tab" onclick="switchTab(6)">🛍️<span>Shop</span></div>
     </nav>
 </div>
 
@@ -406,6 +542,8 @@
         initFirebaseSync();
         renderRouletteWheel();
         document.getElementById('avatar-file-input').addEventListener('change', handleAvatarFileChange);
+        // Ініціалізувати КНП гру
+        rpsInit();
     });
 
     function escapeHtml(value) {
@@ -723,6 +861,9 @@
         refreshSettingsForm();
         updateFriendRequestsList();
         updateFriendsList();
+
+        // Завантажити дані магазину
+        shopLoad();
     }
 
     function updateHeader() {
@@ -778,7 +919,7 @@
         document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
         document.querySelectorAll('nav .tab').forEach(t => t.classList.remove('active'));
         
-        const tabMap = {1: 'tab1', 2: 'tab2', 3: 'tab3', 4: 'tab4', 5: 'tab5'};
+        const tabMap = {1: 'tab1', 2: 'tab2', 3: 'tab3', 4: 'tab4', 5: 'tab5', 6: 'tab6'};
         document.getElementById(tabMap[tabNum]).style.display = 'block';
         document.querySelectorAll('nav .tab')[tabNum - 1].classList.add('active');
         if (tabNum === 4) {
@@ -787,6 +928,9 @@
         }
         if (tabNum === 5) {
             refreshSettingsForm();
+        }
+        if (tabNum === 6) {
+            shopRender();
         }
     }
 
@@ -1421,6 +1565,473 @@
         document.getElementById('avatar-modal').classList.remove('active');
     }
 
+    // ===== КАМІНЬ НОЖИЦІ ПАПІР (КНП) — PvP =====
+
+    // Відповідності: символи, назви та правила перемоги
+    const RPS_ICONS = { rock: '✊', scissors: '✌️', paper: '🖐️' };
+    const RPS_NAMES = { rock: 'КАМІНЬ', scissors: 'НОЖИЦІ', paper: 'ПАПІР' };
+
+    // Повертає: 1 (c1 виграє), -1 (c2 виграє), 0 (нічия), null (обидва не вибрали)
+    function rpsWinner(c1, c2) {
+        if (!c1 && !c2) return 0; // обидва не встигли — нічия
+        if (!c1) return -1;       // гравець 1 не встиг — програш
+        if (!c2) return 1;        // гравець 2 не встиг — програш
+        if (c1 === c2) return 0;
+        if ((c1==='rock'&&c2==='scissors') || (c1==='scissors'&&c2==='paper') || (c1==='paper'&&c2==='rock')) return 1;
+        return -1;
+    }
+
+    // Стан КНП гри (локальні гравці, незалежно від Firebase балансу)
+    let rpsGame = {
+        p1Name: 'Гравець 1',
+        p2Name: 'Гравець 2',
+        p1Bal: 100,
+        p2Bal: 100,
+        bet1: 0,
+        bet2: 0,
+        bet1Ok: false,
+        bet2Ok: false,
+        round: 1,
+        c1: null,
+        c2: null,
+        phase: 'betting', // betting | p1choose | handoff | p2choose | reveal
+        timer: null,
+        countdown: 3,
+        currentPlayer: 1  // чий хід (1 або 2)
+    };
+
+    function rpsLoadSaved() {
+        const saved = localStorage.getItem('rpsGame');
+        if (!saved) return;
+        try {
+            const d = JSON.parse(saved);
+            rpsGame.p1Name = d.p1Name || 'Гравець 1';
+            rpsGame.p2Name = d.p2Name || 'Гравець 2';
+            rpsGame.p1Bal = typeof d.p1Bal === 'number' ? d.p1Bal : 100;
+            rpsGame.p2Bal = typeof d.p2Bal === 'number' ? d.p2Bal : 100;
+        } catch(e) {}
+    }
+
+    function rpsSaveBalances() {
+        localStorage.setItem('rpsGame', JSON.stringify({
+            p1Name: rpsGame.p1Name,
+            p2Name: rpsGame.p2Name,
+            p1Bal: rpsGame.p1Bal,
+            p2Bal: rpsGame.p2Bal
+        }));
+    }
+
+    function rpsInit() {
+        rpsLoadSaved();
+        rpsShowPhase('betting');
+        rpsRenderBetting();
+    }
+
+    function rpsRenderBetting() {
+        document.getElementById('rps-p1-name-lbl').textContent = rpsGame.p1Name;
+        document.getElementById('rps-p2-name-lbl').textContent = rpsGame.p2Name;
+        document.getElementById('rps-p1-bal').textContent = rpsGame.p1Bal.toFixed(2);
+        document.getElementById('rps-p2-bal').textContent = rpsGame.p2Bal.toFixed(2);
+
+        const btn1 = document.getElementById('rps-confirm1-btn');
+        const in1  = document.getElementById('rps-bet1');
+        if (rpsGame.bet1Ok) {
+            btn1.textContent = `✅ СТАВКА ${rpsGame.bet1} — OK`;
+            btn1.style.cssText = 'margin-top:8px;padding:10px;background:rgba(0,255,136,0.1);color:var(--g);border:1px solid var(--g);';
+            btn1.disabled = true;
+            in1.disabled = true;
+        } else {
+            btn1.textContent = '✓ ПІДТВЕРДИТИ';
+            btn1.style.cssText = 'margin-top:8px;padding:10px;';
+            btn1.disabled = false;
+            in1.disabled = false;
+        }
+
+        const btn2 = document.getElementById('rps-confirm2-btn');
+        const in2  = document.getElementById('rps-bet2');
+        if (rpsGame.bet2Ok) {
+            btn2.textContent = `✅ СТАВКА ${rpsGame.bet2} — OK`;
+            btn2.style.cssText = 'margin-top:8px;padding:10px;background:rgba(0,255,136,0.1);color:var(--g);border:1px solid var(--g);';
+            btn2.disabled = true;
+            in2.disabled = true;
+        } else {
+            btn2.textContent = '✓ ПІДТВЕРДИТИ';
+            btn2.style.cssText = 'margin-top:8px;padding:10px;background:#1a1a1a;border:2px solid var(--r);color:var(--r);';
+            btn2.disabled = false;
+            in2.disabled = false;
+        }
+
+        const startBtn = document.getElementById('rps-start-btn');
+        if (rpsGame.bet1Ok && rpsGame.bet2Ok) {
+            startBtn.disabled = false;
+            startBtn.style.cssText = '';
+        } else {
+            startBtn.disabled = true;
+            startBtn.style.cssText = 'background:#222;color:#555;cursor:not-allowed;';
+        }
+
+        const pot = (rpsGame.bet1Ok ? rpsGame.bet1 : 0) + (rpsGame.bet2Ok ? rpsGame.bet2 : 0);
+        const potEl = document.getElementById('rps-pot-display');
+        potEl.textContent = (rpsGame.bet1Ok || rpsGame.bet2Ok) ? `🏆 Банк: ${pot.toFixed(2)}` : '';
+    }
+
+    function rpsConfirmBet(player) {
+        const input = document.getElementById(`rps-bet${player}`);
+        const amount = parseFloat(input.value);
+        const bal = player === 1 ? rpsGame.p1Bal : rpsGame.p2Bal;
+
+        if (!amount || isNaN(amount) || amount <= 0) {
+            showGameNotification('❌ Введіть коректну ставку!');
+            return;
+        }
+        if (amount > bal) {
+            showGameNotification(`❌ Гравець ${player}: недостатньо коштів!`);
+            return;
+        }
+
+        if (player === 1) { rpsGame.bet1 = amount; rpsGame.bet1Ok = true; }
+        else               { rpsGame.bet2 = amount; rpsGame.bet2Ok = true; }
+        rpsRenderBetting();
+    }
+
+    function rpsShowPhase(phase) {
+        rpsGame.phase = phase;
+        document.getElementById('rps-phase-betting').style.display  = phase === 'betting'  ? 'block' : 'none';
+        document.getElementById('rps-phase-choose').style.display   = (phase === 'p1choose' || phase === 'p2choose') ? 'block' : 'none';
+        document.getElementById('rps-phase-handoff').style.display  = phase === 'handoff'  ? 'block' : 'none';
+        document.getElementById('rps-phase-reveal').style.display   = phase === 'reveal'   ? 'block' : 'none';
+
+        if (phase === 'p1choose' || phase === 'p2choose') {
+            const pNum  = phase === 'p1choose' ? 1 : 2;
+            const pName = pNum === 1 ? rpsGame.p1Name : rpsGame.p2Name;
+            document.getElementById('rps-round-label').textContent = `РАУНД ${rpsGame.round}`;
+            document.getElementById('rps-turn-label').textContent  = `ХІД: ${pName}`;
+            document.getElementById('rps-countdown').textContent   = '3';
+            // Активувати кнопки вибору
+            document.querySelectorAll('.rps-choice-btn').forEach(b => { b.disabled = false; });
+        }
+
+        if (phase === 'handoff') {
+            document.getElementById('rps-handoff-msg').textContent =
+                `Передайте пристрій ${rpsGame.p2Name}!`;
+        }
+
+        if (phase === 'reveal') {
+            const c1 = rpsGame.c1;
+            const c2 = rpsGame.c2;
+            document.getElementById('rps-reveal-round').textContent   = `РАУНД ${rpsGame.round} — РЕЗУЛЬТАТ`;
+            document.getElementById('rps-p1-reveal-icon').textContent = c1 ? RPS_ICONS[c1]  : '❓';
+            document.getElementById('rps-p2-reveal-icon').textContent = c2 ? RPS_ICONS[c2]  : '❓';
+            document.getElementById('rps-p1-reveal-name').textContent = rpsGame.p1Name;
+            document.getElementById('rps-p2-reveal-name').textContent = rpsGame.p2Name;
+            document.getElementById('rps-p1-reveal-choice').textContent = c1 ? RPS_NAMES[c1] : '(не вибрав)';
+            document.getElementById('rps-p2-reveal-choice').textContent = c2 ? RPS_NAMES[c2] : '(не вибрав)';
+
+            const result  = rpsWinner(c1, c2);
+            const resultDiv = document.getElementById('rps-round-result');
+            const nextBtn   = document.getElementById('rps-next-btn');
+            const finBtn    = document.getElementById('rps-finish-btn');
+            nextBtn.style.display = 'none';
+            finBtn.style.display  = 'none';
+
+            const pot = rpsGame.bet1 + rpsGame.bet2;
+            if (result === 0) {
+                // Нічия — наступний раунд
+                const nextRound = rpsGame.round + 1;
+                resultDiv.textContent = `🤝 НІЧИЯ! Починається Раунд ${nextRound}...`;
+                resultDiv.style.cssText = 'background:rgba(255,204,0,0.1);color:var(--gold);padding:12px;border-radius:8px;margin:10px 0;font-size:13px;font-weight:900;';
+                nextBtn.style.display = 'block';
+            } else {
+                const winName = result === 1 ? rpsGame.p1Name : rpsGame.p2Name;
+                resultDiv.textContent = `🏆 ${winName} ПЕРЕМАГАЄ! +${pot.toFixed(2)}`;
+                resultDiv.style.cssText = 'background:rgba(0,255,136,0.1);color:var(--g);padding:12px;border-radius:8px;margin:10px 0;font-size:13px;font-weight:900;';
+                finBtn.style.display = 'block';
+            }
+        }
+    }
+
+    function rpsStartRound() {
+        if (!rpsGame.bet1Ok || !rpsGame.bet2Ok) return;
+        rpsGame.c1 = null;
+        rpsGame.c2 = null;
+        rpsGame.currentPlayer = 1;
+        rpsShowPhase('p1choose');
+        rpsStartCountdown(1);
+    }
+
+    function rpsStartCountdown(player) {
+        rpsGame.countdown = 3;
+        clearInterval(rpsGame.timer);
+        const el = document.getElementById('rps-countdown');
+        el.textContent = '3';
+        el.style.color = 'var(--r)';
+
+        rpsGame.timer = setInterval(() => {
+            rpsGame.countdown--;
+            if (rpsGame.countdown > 0) {
+                el.textContent = rpsGame.countdown;
+            } else {
+                // Час вийшов
+                clearInterval(rpsGame.timer);
+                el.textContent = '⏱️';
+                // Заблокувати кнопки вибору
+                document.querySelectorAll('.rps-choice-btn').forEach(b => { b.disabled = true; });
+
+                if (player === 1) {
+                    rpsGame.c1 = null; // не вибрав
+                    rpsShowPhase('handoff');
+                } else {
+                    rpsGame.c2 = null; // не вибрав
+                    rpsShowPhase('reveal');
+                }
+            }
+        }, 1000);
+    }
+
+    function rpsChoose(choice) {
+        if (rpsGame.phase !== 'p1choose' && rpsGame.phase !== 'p2choose') return;
+        clearInterval(rpsGame.timer);
+        // Заблокувати кнопки від повторного вибору
+        document.querySelectorAll('.rps-choice-btn').forEach(b => { b.disabled = true; });
+
+        if (rpsGame.phase === 'p1choose') {
+            rpsGame.c1 = choice;
+            rpsShowPhase('handoff');
+        } else {
+            rpsGame.c2 = choice;
+            rpsShowPhase('reveal');
+        }
+    }
+
+    function rpsHandoffReady() {
+        // Передача пристрою Гравцю 2
+        rpsGame.currentPlayer = 2;
+        rpsShowPhase('p2choose');
+        rpsStartCountdown(2);
+    }
+
+    function rpsNextRound() {
+        // Нічия — починаємо наступний раунд (ставки залишаються)
+        rpsGame.round++;
+        rpsGame.c1 = null;
+        rpsGame.c2 = null;
+        rpsGame.currentPlayer = 1;
+        rpsShowPhase('p1choose');
+        rpsStartCountdown(1);
+    }
+
+    function rpsFinish() {
+        // Визначити переможця та оновити баланси
+        const result = rpsWinner(rpsGame.c1, rpsGame.c2);
+        const pot = rpsGame.bet1 + rpsGame.bet2;
+
+        if (result === 1) {
+            // Гравець 1 виграє — забирає банк
+            rpsGame.p1Bal = parseFloat((rpsGame.p1Bal - rpsGame.bet1 + pot).toFixed(2));
+            rpsGame.p2Bal = parseFloat((rpsGame.p2Bal - rpsGame.bet2).toFixed(2));
+        } else if (result === -1) {
+            // Гравець 2 виграє — забирає банк
+            rpsGame.p2Bal = parseFloat((rpsGame.p2Bal - rpsGame.bet2 + pot).toFixed(2));
+            rpsGame.p1Bal = parseFloat((rpsGame.p1Bal - rpsGame.bet1).toFixed(2));
+        }
+
+        rpsSaveBalances();
+        rpsReset(false); // Повернутись до ставок, зберігаючи баланс
+    }
+
+    function rpsReset(fullReset) {
+        clearInterval(rpsGame.timer);
+        rpsGame.bet1   = 0;
+        rpsGame.bet2   = 0;
+        rpsGame.bet1Ok = false;
+        rpsGame.bet2Ok = false;
+        rpsGame.round  = 1;
+        rpsGame.c1     = null;
+        rpsGame.c2     = null;
+        rpsGame.phase  = 'betting';
+        rpsGame.countdown = 3;
+        rpsGame.currentPlayer = 1;
+
+        if (fullReset) {
+            // Повне скидання: відновити початковий баланс
+            rpsGame.p1Bal = 100;
+            rpsGame.p2Bal = 100;
+            rpsSaveBalances();
+        }
+
+        document.getElementById('rps-bet1').value = '';
+        document.getElementById('rps-bet2').value = '';
+        document.getElementById('rps-bet1').disabled = false;
+        document.getElementById('rps-bet2').disabled = false;
+        rpsShowPhase('betting');
+        rpsRenderBetting();
+    }
+
+    function switchCasinoTab(type) {
+        document.getElementById('casino-roulette').style.display = type === 'roulette' ? 'block' : 'none';
+        document.getElementById('casino-rps').style.display      = type === 'rps'      ? 'block' : 'none';
+        document.getElementById('cs-roulette').classList.toggle('active', type === 'roulette');
+        document.getElementById('cs-rps').classList.toggle('active', type === 'rps');
+        // При переключенні від КНП — зупинити таймер
+        if (type === 'roulette') clearInterval(rpsGame.timer);
+    }
+
+    // ===== МАГАЗИН =====
+
+    const shopCatalog = [
+        // Рамки для аватара
+        { id: 'frame_gold',   name: 'Золота рамка',      cat: 'frames',     price: 500,  icon: '🟡', desc: 'Розкішна золота рамка', shadow: '0 0 0 3px #ffcc00, 0 0 10px rgba(255,204,0,0.5)' },
+        { id: 'frame_neon',   name: 'Неонова рамка',     cat: 'frames',     price: 300,  icon: '🟢', desc: 'Яскрава зелена рамка',  shadow: '0 0 0 3px #00ff88, 0 0 10px rgba(0,255,136,0.5)' },
+        { id: 'frame_red',    name: 'Червона рамка',     cat: 'frames',     price: 200,  icon: '🔴', desc: 'Вогняно-червона рамка', shadow: '0 0 0 3px #ff3366, 0 0 10px rgba(255,51,102,0.5)' },
+        { id: 'frame_cyan',   name: 'Кіберпанк рамка',   cat: 'frames',     price: 700,  icon: '💠', desc: 'Стиль кіберпанк',       shadow: '0 0 0 3px #07FFFF, 0 0 14px rgba(7,255,255,0.6)' },
+        // Шпалери / фони головного екрану
+        { id: 'bg_space',     name: 'Космос',            cat: 'wallpapers', price: 400,  icon: '🌌', desc: 'Зоряне тло',    bg: 'radial-gradient(ellipse at 50% 100%, #1b2735 0%, #090a0f 100%)' },
+        { id: 'bg_neon',      name: 'Неоновий Мегаполіс', cat: 'wallpapers', price: 600, icon: '🌃', desc: 'Нічне місто',   bg: 'linear-gradient(180deg, #0a0015 0%, #1a0030 50%, #000510 100%)' },
+        { id: 'bg_purple',    name: 'Фіолетова галактика', cat: 'wallpapers', price: 500, icon: '💜', desc: 'Галактика',     bg: 'linear-gradient(135deg, #1a0030 0%, #0d001a 50%, #050010 100%)' },
+        { id: 'bg_matrix',    name: 'Матриця',           cat: 'wallpapers', price: 800,  icon: '💻', desc: 'Зелений код',   bg: 'linear-gradient(180deg, #000b00 0%, #001a00 50%, #000500 100%)' },
+        // Різне
+        { id: 'badge_vip',    name: 'VIP Значок',        cat: 'misc',       price: 1000, icon: '👑', desc: 'Покажи свій VIP-статус' },
+        { id: 'title_boss',   name: 'Титул "КРИПТО БОС"', cat: 'misc',      price: 800,  icon: '💎', desc: 'Ексклюзивний титул' },
+        { id: 'effect_spark', name: 'Золоті іскри',      cat: 'misc',       price: 1200, icon: '✨', desc: 'Анімовані частинки' },
+    ];
+
+    // Стан магазину (зберігається в localStorage per user)
+    let shopState = {
+        owned: [],
+        equippedFrame: null,
+        equippedWallpaper: null,
+        activeCat: 'frames'
+    };
+
+    function shopLoad() {
+        if (!gameState.user) return;
+        const saved = localStorage.getItem('shop_' + gameState.user);
+        if (saved) {
+            try {
+                const d = JSON.parse(saved);
+                shopState.owned          = Array.isArray(d.owned) ? d.owned : [];
+                shopState.equippedFrame  = d.equippedFrame  || null;
+                shopState.equippedWallpaper = d.equippedWallpaper || null;
+            } catch(e) {}
+        }
+        shopApplyEquipped();
+    }
+
+    function shopSave() {
+        if (!gameState.user) return;
+        localStorage.setItem('shop_' + gameState.user, JSON.stringify({
+            owned:            shopState.owned,
+            equippedFrame:    shopState.equippedFrame,
+            equippedWallpaper: shopState.equippedWallpaper
+        }));
+    }
+
+    function shopApplyEquipped() {
+        // Застосувати рамку до аватара
+        const avatarEl = document.getElementById('h-a');
+        if (avatarEl) {
+            const frameItem = shopState.equippedFrame
+                ? shopCatalog.find(i => i.id === shopState.equippedFrame)
+                : null;
+            avatarEl.style.boxShadow = frameItem ? frameItem.shadow : '';
+        }
+
+        // Застосувати шпалери до головного екрану
+        const mainEl = document.getElementById('main-scr');
+        if (mainEl) {
+            const bgItem = shopState.equippedWallpaper
+                ? shopCatalog.find(i => i.id === shopState.equippedWallpaper)
+                : null;
+            mainEl.style.background = bgItem ? bgItem.bg : '';
+        }
+    }
+
+    function shopSwitchCat(cat) {
+        shopState.activeCat = cat;
+        // Use data-cat attribute for reliable category matching
+        document.querySelectorAll('.shop-cat-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.cat === cat);
+        });
+        shopRender();
+    }
+
+    function shopRender() {
+        // Оновити відображення балансу
+        document.getElementById('shop-balance').textContent = (gameState.balance || 0).toFixed(4);
+
+        const grid  = document.getElementById('shop-grid');
+        const items = shopCatalog.filter(i => i.cat === shopState.activeCat);
+
+        grid.innerHTML = items.map(item => {
+            const owned    = shopState.owned.includes(item.id);
+            const equipped = shopState.equippedFrame === item.id || shopState.equippedWallpaper === item.id;
+            const canBuy   = !owned && (gameState.balance || 0) >= item.price;
+
+            let btnClass = 'shop-item-btn';
+            let btnText  = `🛒 ${item.price} BB`;
+            let btnDisabled = '';
+
+            if (owned && equipped) {
+                btnClass = 'shop-item-btn equipped-btn';
+                btnText  = '✅ ОСНАЩЕНО';
+            } else if (owned && item.cat !== 'misc') {
+                btnClass = 'shop-item-btn equip-btn';
+                btnText  = '👉 ОСНАСТИТИ';
+            } else if (owned) {
+                btnClass = 'shop-item-btn owned-misc-btn';
+                btnText  = '✅ КУПЛЕНО';
+                btnDisabled = 'disabled';
+            } else if (!canBuy) {
+                btnDisabled = 'disabled';
+            }
+
+            return `
+                <div class="shop-item ${owned ? 'owned' : ''} ${equipped ? 'equipped' : ''}">
+                    <div class="shop-item-preview">${item.icon}</div>
+                    <div class="shop-item-name">${escapeHtml(item.name)}</div>
+                    <div class="shop-item-price">${owned ? '✓ У вас є' : item.price + ' BB'}</div>
+                    <button class="${btnClass}" onclick="shopAction('${item.id}')" ${btnDisabled}>${btnText}</button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function shopAction(itemId) {
+        const item  = shopCatalog.find(i => i.id === itemId);
+        if (!item) return;
+
+        const owned = shopState.owned.includes(itemId);
+
+        if (!owned) {
+            // Покупка
+            if ((gameState.balance || 0) < item.price) {
+                showGameNotification('❌ Недостатньо BB для купівлі!');
+                return;
+            }
+            gameState.balance -= item.price;
+            shopState.owned.push(itemId);
+            updateHeader();
+            // Зберегти новий баланс у Firebase
+            updateMiningBalanceFirebase(gameState.user, gameState.balance);
+            showGameNotification(`✅ ${item.name} — куплено!`);
+        } else if (item.cat === 'frames') {
+            // Перемкнути рамку
+            shopState.equippedFrame = (shopState.equippedFrame === itemId) ? null : itemId;
+            const msg = shopState.equippedFrame === itemId ? `✅ ${item.name} оснащено!` : `🔄 Рамку знято`;
+            showGameNotification(msg);
+            shopApplyEquipped();
+        } else if (item.cat === 'wallpapers') {
+            // Перемкнути шпалери
+            shopState.equippedWallpaper = (shopState.equippedWallpaper === itemId) ? null : itemId;
+            const msg = shopState.equippedWallpaper === itemId ? `✅ ${item.name} встановлено!` : `🔄 Шпалери знято`;
+            showGameNotification(msg);
+            shopApplyEquipped();
+        }
+
+        shopSave();
+        shopRender();
+    }
+
     function logout() {
         // Clear typing and set offline before cleanup
         if (gameState.user) {
@@ -1449,6 +2060,11 @@
         gameState.unreadCounts = {};
         gameState.friendsOnline = {};
         allUsers = {};
+        // Скинути магазин
+        shopState.owned = [];
+        shopState.equippedFrame = null;
+        shopState.equippedWallpaper = null;
+        shopApplyEquipped();
         document.getElementById('main-scr').style.display = 'none';
         document.getElementById('auth-scr').style.display = 'flex';
         document.getElementById('login-u').value = '';
