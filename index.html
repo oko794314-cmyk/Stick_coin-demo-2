@@ -301,6 +301,11 @@
         'https://api.dicebear.com/7.x/avataaars/svg?seed=user5',
         'https://api.dicebear.com/7.x/avataaars/svg?seed=user6',
     ];
+    const rouletteColorMeta = {
+        red: { hex: '#ff3366', emoji: '🔴' },
+        green: { hex: '#00ff88', emoji: '🟢' },
+        black: { hex: '#1a1a1a', emoji: '⚫' }
+    };
     const rouletteSegmentColors = ['green', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black'];
     const rouletteSegments = rouletteSegmentColors.map((segmentColor, index) => {
         const segmentAngle = 360 / rouletteSegmentColors.length;
@@ -313,6 +318,10 @@
     const roulettePayouts = { red: 2, black: 2, green: 14 };
     const rouletteSpinDuration = 5600;
     const roulettePointerPadding = 2;
+    const rouletteMinSegmentRange = 0.1;
+    const maxDisplayNameLength = 24;
+    const minPasswordLength = 4;
+    const maxAvatarFileSize = 2 * 1024 * 1024;
 
     let allUsers = {};
     let mineInterval = null;
@@ -359,7 +368,7 @@
 
     function getRouletteGradient() {
         return `conic-gradient(from -90deg, ${rouletteSegments.map(segment =>
-            `${segment.color === 'red' ? '#ff3366' : segment.color === 'green' ? '#00ff88' : '#1a1a1a'} ${segment.start}deg ${segment.end}deg`
+            `${rouletteColorMeta[segment.color].hex} ${segment.start}deg ${segment.end}deg`
         ).join(', ')})`;
     }
 
@@ -390,7 +399,7 @@
     function getRandomStopAngleForSegment(segment) {
         const safeStart = segment.start + roulettePointerPadding;
         const safeEnd = segment.end - roulettePointerPadding;
-        return safeStart + (Math.random() * Math.max(safeEnd - safeStart, 0.1));
+        return safeStart + (Math.random() * Math.max(safeEnd - safeStart, rouletteMinSegmentRange));
     }
 
     function formatUserLabel(username) {
@@ -675,7 +684,7 @@
             });
         });
 
-        window.setTimeout(async () => {
+        setTimeout(async () => {
             gameState.rouletteRotation = normalizeAngle(targetRotation);
             wheel.style.transition = 'none';
             wheel.style.transform = `rotate(${gameState.rouletteRotation}deg)`;
@@ -684,7 +693,7 @@
             const resultSegment = getRouletteResultForRotation(gameState.rouletteRotation);
             const isWin = resultSegment.color === color;
             const multiplier = roulettePayouts[resultSegment.color];
-            const resultEmoji = resultSegment.color === 'red' ? '🔴' : resultSegment.color === 'green' ? '🟢' : '⚫';
+            const resultEmoji = rouletteColorMeta[resultSegment.color].emoji;
 
             if (isWin) {
                 gameState.balance += amount * multiplier;
@@ -913,8 +922,9 @@
         gameState.friendRequests = gameState.friendRequests.filter(name => name !== requester);
         gameState.friends = [...new Set([...gameState.friends, requester])];
         gameState.expandedFriendRequest = null;
+        const requesterFriends = [...new Set([...(allUsers[requester]?.friends || []), gameState.user])];
         updateCachedUser(gameState.user, { friends: gameState.friends, friendRequests: gameState.friendRequests });
-        updateCachedUser(requester, { ...(allUsers[requester] || {}), friends: [...new Set([...(allUsers[requester]?.friends || []), gameState.user])] });
+        updateCachedUser(requester, { friends: requesterFriends });
         updateFriendRequestsList();
         updateFriendsList();
         showGameNotification(`✅ ${formatUserLabel(requester)} додано в друзі`);
@@ -990,7 +1000,7 @@
             event.target.value = '';
             return;
         }
-        if (file.size > 2 * 1024 * 1024) {
+        if (file.size > maxAvatarFileSize) {
             alert('Зображення має бути менше 2 MB');
             event.target.value = '';
             return;
@@ -1024,7 +1034,7 @@
             alert('Введіть імʼя');
             return;
         }
-        if (nextDisplayName.length > 24) {
+        if (nextDisplayName.length > maxDisplayNameLength) {
             alert('Імʼя має бути до 24 символів');
             return;
         }
@@ -1052,7 +1062,7 @@
             alert('Заповніть усі поля пароля');
             return;
         }
-        if (newPassword.length < 4) {
+        if (newPassword.length < minPasswordLength) {
             alert('Новий пароль має містити мінімум 4 символи');
             return;
         }
