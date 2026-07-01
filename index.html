@@ -37,12 +37,11 @@
         .view.active { display: block; animation: slideIn 0.4s ease; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .r-wrap { position: relative; width: 250px; height: 250px; margin: 20px auto; }
-        .r-box { width: 100%; height: 100%; border-radius: 50%; border: 6px solid var(--gold); transition: 1.2s cubic-bezier(0.05, 0.5, 0.1, 1); 
-            background: conic-gradient(#ff3366 0deg 80deg, #00ff88 80deg 160deg, #1a1a1a 160deg 280deg, #ff3366 280deg 360deg); 
-            box-shadow: 0 0 30px rgba(255, 204, 0, 0.3); }
-        .r-box.spin { animation: wheelSpin 5s ease-out; }
-        @keyframes wheelSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(3600deg); } }
+        .r-wrap { position: relative; width: 250px; height: 250px; margin: 20px auto; display:flex; align-items:center; justify-content:center; }
+        .r-box { width: 100%; height: 100%; border-radius: 50%; border: 6px solid var(--gold); box-shadow: 0 0 30px rgba(255, 204, 0, 0.3); will-change: transform; transform: rotate(0deg); }
+        .roulette-pointer { position:absolute; top:-10px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:14px solid transparent; border-right:14px solid transparent; border-top:28px solid var(--gold); filter: drop-shadow(0 0 10px rgba(255, 204, 0, 0.7)); z-index:3; }
+        .roulette-pointer::after { content:''; position:absolute; left:-5px; top:-31px; width:10px; height:10px; border-radius:50%; background:var(--gold); box-shadow:0 0 12px rgba(255, 204, 0, 0.7); }
+        .roulette-center { position:absolute; width:26px; height:26px; border-radius:50%; background:radial-gradient(circle, #fff 0%, var(--gold) 45%, #6d5200 100%); border:2px solid rgba(0,0,0,0.35); z-index:2; pointer-events:none; }
 
         .ttt { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; max-width: 210px; margin: 15px auto; }
         .c { aspect-ratio: 1; background: #000; border: 2px solid #333; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; border-radius: 8px; cursor: pointer; }
@@ -58,9 +57,22 @@
         .orb:hover { transform: scale(1.08); box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
         .orb.on { border-color: var(--r); animation: miningPulse 1.5s infinite; background: rgba(255, 51, 102, 0.15); }
 
-        .friend-item { background: #000; padding: 10px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; }
+        .friend-item { background: #000; padding: 10px; border-radius: 8px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; border: 1px solid #222; cursor:pointer; transition: all 0.2s; }
         .friend-item:hover { border-color: var(--p); background: rgba(7, 255, 255, 0.05); }
         .friend-item button { width: 60px; padding: 8px; font-size: 11px; }
+        .friend-item-main { display:flex; flex-direction:column; gap:2px; }
+        .friend-item-subtitle { font-size:10px; color:#666; }
+        .request-actions { display:flex; gap:8px; margin-top:10px; }
+        .request-actions .btn { margin:0; }
+        .chat-msg { white-space: pre-wrap; word-break: break-word; }
+        .chat-empty { color:#666; text-align:center; padding:20px 0; font-size:12px; }
+        .settings-section { margin-bottom:15px; }
+        .settings-label { display:block; font-size:10px; color:var(--p); margin-top:12px; }
+        .secondary-btn { background:#111; color:var(--p); border:1px solid #333; }
+        .danger-btn { background:var(--r); color:#fff; }
+        .settings-avatar-actions { display:flex; gap:10px; margin-top:15px; }
+        .settings-avatar-preview { width:72px; height:72px; border-radius:50%; border:2px solid var(--p); object-fit:cover; background:#000; display:block; margin:0 auto 10px; }
+        .hidden-file-input { display:none; }
 
         .user-search-results { background: #000; border: 1px solid #333; border-radius: 8px; max-height: 150px; overflow-y: auto; margin-top: 10px; }
         .user-result { padding: 10px; border-bottom: 1px solid #222; display: flex; align-items: center; cursor: pointer; }
@@ -179,12 +191,16 @@
         <h3 style="margin-top:0;">🎰 CASINO</h3>
         <div class="glass" style="text-align:center;">
             <p style="margin:0 0 10px; font-size:12px; color:#555;">РУЛЕТКА</p>
-            <div class="r-wrap"><div id="wheel" class="r-box"></div></div>
+            <div class="r-wrap">
+                <div class="roulette-pointer" aria-hidden="true"></div>
+                <div id="wheel" class="r-box"></div>
+                <div class="roulette-center" aria-hidden="true"></div>
+            </div>
             <input type="number" id="bet-amt" placeholder="СТАВКА" min="0.0001" step="0.0001">
             <div style="display:flex; gap:5px; margin-top:10px;">
-                <button class="btn" onclick="spin('red')" style="flex:1; background:#1a1a1a; border:2px solid #ff3366; color:#ff3366;">🔴 RED (x3)</button>
-                <button class="btn" onclick="spin('green')" style="flex:1; background:#1a1a1a; border:2px solid #00ff88; color:#00ff88;">🟢 GREEN (x2)</button>
-                <button class="btn" onclick="spin('black')" style="flex:1; background:#1a1a1a; border:2px solid #333;">⬛ BLACK (x5)</button>
+                <button class="btn" onclick="spin('red')" style="flex:1; background:#1a1a1a; border:2px solid #ff3366; color:#ff3366;">🔴 RED (x2)</button>
+                <button class="btn" onclick="spin('green')" style="flex:1; background:#1a1a1a; border:2px solid #00ff88; color:#00ff88;">🟢 GREEN 0 (x14)</button>
+                <button class="btn" onclick="spin('black')" style="flex:1; background:#1a1a1a; border:2px solid #333;">⬛ BLACK (x2)</button>
             </div>
         </div>
     </div>
@@ -225,8 +241,26 @@
     <!-- ВКЛ.5: НАЛАШТУВАННЯ -->
     <div id="tab5" class="view">
         <h3>⚙️ НАЛАШТУВАННЯ</h3>
-        <div class="glass">
-            <button class="btn" onclick="logout()" style="background:var(--r); color:#fff;">ВИХІД</button>
+        <div class="glass settings-section">
+            <img id="settings-avatar-preview" class="settings-avatar-preview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" alt="User profile avatar preview">
+            <button class="btn secondary-btn" onclick="openAvatarModal()">ЗМІНИТИ АВАТАР</button>
+        </div>
+        <div class="glass settings-section">
+            <label class="settings-label" for="settings-display-name">ІМʼЯ ВІДОБРАЖЕННЯ</label>
+            <input type="text" id="settings-display-name" placeholder="Ваше імʼя">
+            <button class="btn" onclick="saveDisplayName()">ЗБЕРЕГТИ ІМʼЯ</button>
+        </div>
+        <div class="glass settings-section">
+            <label class="settings-label" for="settings-current-password">ПОТОЧНИЙ ПАРОЛЬ</label>
+            <input type="password" id="settings-current-password" placeholder="Поточний пароль">
+            <label class="settings-label" for="settings-new-password">НОВИЙ ПАРОЛЬ</label>
+            <input type="password" id="settings-new-password" placeholder="Новий пароль">
+            <label class="settings-label" for="settings-confirm-password">ПІДТВЕРДЖЕННЯ ПАРОЛЯ</label>
+            <input type="password" id="settings-confirm-password" placeholder="Повторіть новий пароль">
+            <button class="btn" onclick="changePassword()">ЗМІНИТИ ПАРОЛЬ</button>
+        </div>
+        <div class="glass settings-section" style="margin-top:25px;">
+            <button class="btn danger-btn" onclick="logout()">ВИЙТИ З АКАУНТА</button>
         </div>
     </div>
 
@@ -244,6 +278,10 @@
 <div id="avatar-modal" class="modal">
     <div class="modal-content">
         <h2 style="text-align:center;">ОБЕРІТЬ АВАТАР</h2>
+        <input id="avatar-file-input" class="hidden-file-input" type="file" accept="image/*">
+        <div class="settings-avatar-actions">
+            <button class="btn secondary-btn" onclick="document.getElementById('avatar-file-input').click()">З ГАЛЕРЕЇ</button>
+        </div>
         <div id="avatar-gallery" style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:15px 0;"></div>
         <div style="display:flex; gap:10px; margin-top:15px;">
             <button class="btn" onclick="closeAvatarModal()" style="background:#666;">НАЗАД</button>
@@ -263,6 +301,30 @@
         'https://api.dicebear.com/7.x/avataaars/svg?seed=user5',
         'https://api.dicebear.com/7.x/avataaars/svg?seed=user6',
     ];
+    const rouletteColorMeta = {
+        red: { hex: '#ff3366', emoji: '🔴' },
+        green: { hex: '#00ff88', emoji: '🟢' },
+        black: { hex: '#1a1a1a', emoji: '⚫' }
+    };
+    const rouletteSegmentColors = ['green', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black', 'red', 'black'];
+    const rouletteSegments = rouletteSegmentColors.map((segmentColor, index) => {
+        const segmentAngle = 360 / rouletteSegmentColors.length;
+        return {
+            color: segmentColor,
+            start: index * segmentAngle,
+            end: (index + 1) * segmentAngle
+        };
+    });
+    const roulettePayouts = { red: 2, black: 2, green: 14 };
+    const rouletteSpinDuration = 5600;
+    const roulettePointerPadding = 2;
+    const rouletteMinSegmentRange = 0.1;
+    const rouletteMinFullTurns = 6;
+    const rouletteExtraFullTurnsRange = 3;
+    const maxDisplayNameLength = 24;
+    const minPasswordLength = 4;
+    const maxAvatarFileSize = 2 * 1024 * 1024;
+    const maxAvatarFileSizeMB = maxAvatarFileSize / (1024 * 1024);
 
     let allUsers = {};
     let mineInterval = null;
@@ -270,6 +332,8 @@
 
     let gameState = {
         user: null,
+        displayName: null,
+        avatar: avatarGallery[0],
         balance: 0,
         mining: false,
         friends: [],
@@ -277,7 +341,10 @@
         privateChatMessages: {},
         gameInvitations: {},
         currentChatFriend: null,
-        miningStartTime: 0
+        miningStartTime: 0,
+        expandedFriendRequest: null,
+        rouletteRotation: 0,
+        rouletteSpinning: false
     };
 
     // ===== ІНІЦІАЛІЗАЦІЯ =====
@@ -285,7 +352,84 @@
         // Ініціалізувати Firebase
         initFirebaseSync();
         document.getElementById('firebase-status').style.display = 'block';
+        renderRouletteWheel();
+        document.getElementById('avatar-file-input').addEventListener('change', handleAvatarFileChange);
     });
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function normalizeAngle(angle) {
+        return ((angle % 360) + 360) % 360;
+    }
+
+    function getRouletteGradient() {
+        return `conic-gradient(from -90deg, ${rouletteSegments.map(segment =>
+            `${rouletteColorMeta[segment.color].hex} ${segment.start}deg ${segment.end}deg`
+        ).join(', ')})`;
+    }
+
+    function renderRouletteWheel() {
+        const wheel = document.getElementById('wheel');
+        if (!wheel) return;
+        wheel.style.background = getRouletteGradient();
+        wheel.style.transform = `rotate(${gameState.rouletteRotation}deg)`;
+    }
+
+    function getRouletteSegmentByWheelAngle(angle) {
+        const normalized = normalizeAngle(angle);
+        return rouletteSegments.find(segment => normalized >= segment.start && normalized < segment.end) || rouletteSegments[rouletteSegments.length - 1];
+    }
+
+    function getWheelAngleUnderPointer(rotation) {
+        return normalizeAngle(360 - normalizeAngle(rotation));
+    }
+
+    function getRouletteResultForRotation(rotation) {
+        return getRouletteSegmentByWheelAngle(getWheelAngleUnderPointer(rotation));
+    }
+
+    function pickRouletteSegment() {
+        return rouletteSegments[Math.floor(Math.random() * rouletteSegments.length)];
+    }
+
+    function getRandomStopAngleForSegment(segment) {
+        const safeStart = segment.start + roulettePointerPadding;
+        const safeEnd = segment.end - roulettePointerPadding;
+        return safeStart + (Math.random() * Math.max(safeEnd - safeStart, rouletteMinSegmentRange));
+    }
+
+    function formatUserLabel(username) {
+        const userData = allUsers[username] || {};
+        const displayName = (userData.displayName || username || '').trim();
+        return displayName !== username ? `${displayName} (@${username})` : username;
+    }
+
+    function updateCachedUser(username, updates) {
+        allUsers[username] = {
+            ...(allUsers[username] || {}),
+            ...updates
+        };
+    }
+
+    function refreshSettingsForm() {
+        if (!gameState.user) return;
+        document.getElementById('settings-display-name').value = gameState.displayName || gameState.user;
+        document.getElementById('settings-avatar-preview').src = gameState.avatar || avatarGallery[0];
+    }
+
+    window.__stickAppDebug = {
+        getRouletteSegments: () => rouletteSegments.map(segment => ({ ...segment })),
+        normalizeAngle,
+        getWheelAngleUnderPointer,
+        getRouletteResultForRotation
+    };
 
     // ===== АУТЕНТИФІКАЦІЯ =====
     function switchAuth(type) {
@@ -309,6 +453,7 @@
 
         const userData = {
             username: username,
+            displayName: username,
             password: password,
             balance: 0,
             avatar: avatarGallery[Math.floor(Math.random() * avatarGallery.length)],
@@ -350,9 +495,14 @@
         }
 
         gameState.user = username;
+        gameState.displayName = userData.displayName || username;
+        gameState.avatar = userData.avatar || avatarGallery[0];
         gameState.balance = userData.balance || 0;
         gameState.friends = userData.friends || [];
         gameState.friendRequests = userData.friendRequests || [];
+        gameState.privateChatMessages = {};
+        gameState.currentChatFriend = null;
+        gameState.expandedFriendRequest = null;
 
         // Показати основний екран
         document.getElementById('auth-scr').style.display = 'none';
@@ -362,16 +512,21 @@
         setupAllListenersOnLogin(username);
         
         updateHeader();
-        document.getElementById('h-a').src = userData.avatar;
 
         // Завантажити всіх користувачів
         allUsers = await loadAllUsersFromFirebase();
+        updateCachedUser(username, userData);
+        refreshSettingsForm();
+        updateFriendRequestsList();
+        updateFriendsList();
     }
 
     function updateHeader() {
-        document.getElementById('h-u').textContent = gameState.user || '---';
+        document.getElementById('h-u').textContent = gameState.displayName || gameState.user || '---';
         document.getElementById('h-b').textContent = gameState.balance.toFixed(4);
         document.getElementById('v-bal').textContent = gameState.balance.toFixed(4);
+        document.getElementById('h-a').src = gameState.avatar || avatarGallery[0];
+        document.getElementById('settings-avatar-preview').src = gameState.avatar || avatarGallery[0];
     }
 
     function updateSyncIndicator(isSynced) {
@@ -399,6 +554,13 @@
         const tabMap = {1: 'tab1', 2: 'tab2', 3: 'tab3', 4: 'tab4', 5: 'tab5'};
         document.getElementById(tabMap[tabNum]).style.display = 'block';
         document.querySelectorAll('nav .tab')[tabNum - 1].classList.add('active');
+        if (tabNum === 4) {
+            updateFriendRequestsList();
+            updateFriendsList();
+        }
+        if (tabNum === 5) {
+            refreshSettingsForm();
+        }
     }
 
     // ===== МАЙНИНГ =====
@@ -488,6 +650,10 @@
 
     // ===== РУЛЕТКА =====
     function spin(color) {
+        if (gameState.rouletteSpinning) {
+            return;
+        }
+
         const amount = parseFloat(document.getElementById('bet-amt').value);
         if (!amount || amount <= 0) {
             alert('Введіть ставку!');
@@ -499,40 +665,48 @@
         }
 
         const wheel = document.getElementById('wheel');
-        wheel.classList.remove('spin');
-        setTimeout(() => wheel.classList.add('spin'), 10);
+        const winningSegment = pickRouletteSegment();
+        const stopWheelAngle = getRandomStopAngleForSegment(winningSegment);
+        const finalRotationNormalized = normalizeAngle(360 - stopWheelAngle);
+        const currentRotationNormalized = normalizeAngle(gameState.rouletteRotation);
+        const deltaRotation = normalizeAngle(finalRotationNormalized - currentRotationNormalized);
+        const fullTurns = rouletteMinFullTurns + Math.floor(Math.random() * rouletteExtraFullTurnsRange);
+        const targetRotation = gameState.rouletteRotation + (fullTurns * 360) + deltaRotation;
 
-        setTimeout(() => {
-            const result = Math.random();
-            const redChance = 0.33;
-            const greenChance = 0.33;
-            
-            let won = false;
-            let multiplier = 0;
-            
-            if (color === 'red' && result < redChance) {
-                won = true;
-                multiplier = 3;
-            } else if (color === 'green' && result >= redChance && result < (redChance + greenChance)) {
-                won = true;
-                multiplier = 2;
-            } else if (color === 'black' && result >= (redChance + greenChance)) {
-                won = true;
-                multiplier = 5;
-            }
+        gameState.rouletteSpinning = true;
+        wheel.style.transition = 'none';
+        wheel.style.transform = `rotate(${gameState.rouletteRotation}deg)`;
 
-            if (won) {
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                wheel.style.transition = `transform ${rouletteSpinDuration}ms cubic-bezier(0.12, 0.82, 0.18, 1)`;
+                wheel.style.transform = `rotate(${targetRotation}deg)`;
+            });
+        });
+
+        setTimeout(async () => {
+            gameState.rouletteRotation = normalizeAngle(targetRotation);
+            wheel.style.transition = 'none';
+            wheel.style.transform = `rotate(${gameState.rouletteRotation}deg)`;
+            gameState.rouletteSpinning = false;
+
+            const resultSegment = getRouletteResultForRotation(gameState.rouletteRotation);
+            const isWin = resultSegment.color === color;
+            const multiplier = roulettePayouts[resultSegment.color];
+            const resultEmoji = rouletteColorMeta[resultSegment.color].emoji;
+
+            if (isWin) {
                 gameState.balance += amount * multiplier;
-                showGameNotification(`🎉 ВИГРАЛ! +${(amount * multiplier).toFixed(4)}`);
+                showGameNotification(`🎯 ${resultEmoji} ${resultSegment.color.toUpperCase()} — ВИГРАШ +${(amount * multiplier).toFixed(4)}`);
             } else {
                 gameState.balance -= amount;
-                showGameNotification(`😞 Програв -${amount.toFixed(4)}`);
+                showGameNotification(`🎯 ${resultEmoji} ${resultSegment.color.toUpperCase()} — ПРОГРАШ -${amount.toFixed(4)}`);
             }
 
             document.getElementById('bet-amt').value = '';
             updateHeader();
-            updateMiningBalanceFirebase(gameState.user, gameState.balance);
-        }, 5000);
+            await updateMiningBalanceFirebase(gameState.user, gameState.balance);
+        }, rouletteSpinDuration);
     }
 
     // ===== ДРУЗІ =====
@@ -550,10 +724,14 @@
             u !== gameState.user && 
             !gameState.friends.includes(u)
         );
-
-        resultsDiv.innerHTML = results.map(user => `
-            <div class="user-result" onclick="selectFriendToAdd('${user}')">${user}</div>
-        `).join('');
+        resultsDiv.innerHTML = '';
+        results.forEach(user => {
+            const item = document.createElement('div');
+            item.className = 'user-result';
+            item.textContent = formatUserLabel(user);
+            item.addEventListener('click', () => selectFriendToAdd(user));
+            resultsDiv.appendChild(item);
+        });
         resultsDiv.style.display = results.length > 0 ? 'block' : 'none';
     }
 
@@ -568,29 +746,111 @@
             alert('Виберіть користувача!');
             return;
         }
+        if (username === gameState.user) {
+            alert('Не можна додати себе!');
+            return;
+        }
 
-        await sendFriendRequestFirebase(gameState.user, username);
+        const success = await sendFriendRequestFirebase(gameState.user, username);
+        if (!success) {
+            alert('Не вдалося надіслати запит або він уже існує');
+            return;
+        }
+
         showGameNotification(`📬 Запит відправлено ${username}`);
         document.getElementById('f-u').value = '';
     }
 
     function updateFriendRequestsList() {
         const container = document.getElementById('f-requests');
-        container.innerHTML = gameState.friendRequests.map(req => `
-            <div style="background:#000; padding:10px; border-radius:8px; margin:8px 0; border:1px solid #222; display:flex; justify-content:space-between; align-items:center;">
-                <span>${req}</span>
-            </div>
-        `).join('');
+        if (gameState.friendRequests.length === 0) {
+            container.innerHTML = '<div class="chat-empty">Немає нових запитів</div>';
+            return;
+        }
+
+        container.innerHTML = '';
+        gameState.friendRequests.forEach(requester => {
+            const card = document.createElement('div');
+            card.className = 'friend-item';
+            card.setAttribute('role', 'button');
+            card.setAttribute('tabindex', '0');
+
+            const expanded = gameState.expandedFriendRequest === requester;
+            card.innerHTML = `
+                <div class="friend-item-main">
+                    <strong>${escapeHtml(formatUserLabel(requester))}</strong>
+                    <span class="friend-item-subtitle">${expanded ? 'Оберіть дію для запиту' : 'Натисніть, щоб відкрити дії'}</span>
+                </div>
+            `;
+
+            card.addEventListener('click', () => toggleFriendRequestActions(requester));
+            card.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    toggleFriendRequestActions(requester);
+                }
+            });
+
+            if (expanded) {
+                const actions = document.createElement('div');
+                actions.className = 'request-actions';
+
+                const acceptButton = document.createElement('button');
+                acceptButton.className = 'btn';
+                acceptButton.style.background = 'var(--g)';
+                acceptButton.style.color = '#000';
+                acceptButton.textContent = 'ПРИЙНЯТИ';
+                acceptButton.addEventListener('click', async (event) => {
+                    event.stopPropagation();
+                    await acceptFriendRequest(requester);
+                });
+
+                const rejectButton = document.createElement('button');
+                rejectButton.className = 'btn danger-btn';
+                rejectButton.textContent = 'ВІДХИЛИТИ';
+                rejectButton.addEventListener('click', async (event) => {
+                    event.stopPropagation();
+                    await rejectFriendRequest(requester);
+                });
+
+                actions.appendChild(acceptButton);
+                actions.appendChild(rejectButton);
+                card.appendChild(actions);
+            }
+
+            container.appendChild(card);
+        });
     }
 
     function updateFriendsList() {
         const container = document.getElementById('f-list');
-        container.innerHTML = gameState.friends.map(friend => `
-            <div class="friend-item">
-                <span>${friend}</span>
-                <button class="btn" style="width:60px; font-size:11px;" onclick="openChat('${friend}')">💬</button>
-            </div>
-        `).join('');
+        if (gameState.friends.length === 0) {
+            container.innerHTML = '<div class="chat-empty">Список друзів порожній</div>';
+            return;
+        }
+
+        container.innerHTML = '';
+        gameState.friends.forEach(friend => {
+            const item = document.createElement('div');
+            item.className = 'friend-item';
+            item.setAttribute('role', 'button');
+            item.setAttribute('tabindex', '0');
+            item.innerHTML = `
+                <div class="friend-item-main">
+                    <strong>${escapeHtml(formatUserLabel(friend))}</strong>
+                    <span class="friend-item-subtitle">Натисніть, щоб відкрити чат</span>
+                </div>
+                <span aria-hidden="true">💬</span>
+            `;
+            item.addEventListener('click', () => openChat(friend));
+            item.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openChat(friend);
+                }
+            });
+            container.appendChild(item);
+        });
     }
 
     function openChat(friendUsername) {
@@ -598,22 +858,28 @@
         setupChatListener(gameState.user, friendUsername);
         document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
         document.getElementById('tab4-chat').style.display = 'block';
-        document.getElementById('chat-friend-name').textContent = friendUsername;
+        document.getElementById('chat-friend-name').textContent = formatUserLabel(friendUsername);
         displayPrivateChat();
     }
 
     function backToFriendsList() {
         gameState.currentChatFriend = null;
+        document.getElementById('private-msg-in').value = '';
         switchTab(4);
     }
 
     function displayPrivateChat() {
         const container = document.getElementById('private-chat-messages');
         const messages = gameState.privateChatMessages[gameState.currentChatFriend] || [];
-        
+
+        if (messages.length === 0) {
+            container.innerHTML = '<div class="chat-empty">Напишіть перше повідомлення</div>';
+            return;
+        }
+
         container.innerHTML = messages.map(msg => `
             <div class="chat-msg ${msg.from === gameState.user ? 'own' : 'other'}">
-                ${msg.text}
+                ${escapeHtml(msg.text)}
             </div>
         `).join('');
         
@@ -630,23 +896,52 @@
         const input = document.getElementById('private-msg-in');
         const message = input.value.trim();
 
-        if (!message) return;
+        if (!message || !gameState.currentChatFriend) return;
 
-        await sendPrivateMessageFirebase(gameState.user, gameState.currentChatFriend, message);
-        
-        // Додати локально
-        if (!gameState.privateChatMessages[gameState.currentChatFriend]) {
-            gameState.privateChatMessages[gameState.currentChatFriend] = [];
+        const success = await sendPrivateMessageFirebase(gameState.user, gameState.currentChatFriend, message);
+        if (!success) {
+            alert('Не вдалося надіслати повідомлення');
+            return;
         }
-        gameState.privateChatMessages[gameState.currentChatFriend].push({
-            from: gameState.user,
-            to: gameState.currentChatFriend,
-            text: message,
-            timestamp: Date.now()
-        });
 
         input.value = '';
-        displayPrivateChat();
+    }
+
+    function toggleFriendRequestActions(requester) {
+        gameState.expandedFriendRequest = gameState.expandedFriendRequest === requester ? null : requester;
+        updateFriendRequestsList();
+    }
+
+    async function acceptFriendRequest(requester) {
+        const success = await acceptFriendRequestFirebase(gameState.user, requester);
+        if (!success) {
+            alert('Не вдалося прийняти запит');
+            return;
+        }
+
+        gameState.friendRequests = gameState.friendRequests.filter(name => name !== requester);
+        gameState.friends = [...new Set([...gameState.friends, requester])];
+        gameState.expandedFriendRequest = null;
+        const requesterFriends = [...new Set([...(allUsers[requester]?.friends || []), gameState.user])];
+        updateCachedUser(gameState.user, { friends: gameState.friends, friendRequests: gameState.friendRequests });
+        updateCachedUser(requester, { friends: requesterFriends });
+        updateFriendRequestsList();
+        updateFriendsList();
+        showGameNotification(`✅ ${formatUserLabel(requester)} додано в друзі`);
+    }
+
+    async function rejectFriendRequest(requester) {
+        const success = await rejectFriendRequestFirebase(gameState.user, requester);
+        if (!success) {
+            alert('Не вдалося відхилити запит');
+            return;
+        }
+
+        gameState.friendRequests = gameState.friendRequests.filter(name => name !== requester);
+        gameState.expandedFriendRequest = null;
+        updateCachedUser(gameState.user, { friendRequests: gameState.friendRequests });
+        updateFriendRequestsList();
+        showGameNotification(`❌ Запит від ${formatUserLabel(requester)} відхилено`);
     }
 
     function acceptGameRequest() {
@@ -664,15 +959,134 @@
     function openAvatarModal() {
         const modal = document.getElementById('avatar-modal');
         const gallery = document.getElementById('avatar-gallery');
-        gallery.innerHTML = avatarGallery.map(avatar => `
-            <img src="${avatar}" alt="avatar" style="width:60px; height:60px; border-radius:50%; cursor:pointer; border:2px solid #333; transition:all 0.2s;" onclick="selectAvatar('${avatar}')" title="Select">
-        `).join('');
+        gallery.innerHTML = '';
+        avatarGallery.forEach(avatar => {
+            const image = document.createElement('img');
+            image.src = avatar;
+            image.alt = 'avatar';
+            image.style.width = '60px';
+            image.style.height = '60px';
+            image.style.borderRadius = '50%';
+            image.style.cursor = 'pointer';
+            image.style.border = '2px solid #333';
+            image.style.transition = 'all 0.2s';
+            image.title = 'Select';
+            image.addEventListener('click', () => selectAvatar(avatar));
+            gallery.appendChild(image);
+        });
+        document.getElementById('avatar-file-input').value = '';
         modal.classList.add('active');
     }
 
-    function selectAvatar(avatar) {
-        document.getElementById('h-a').src = avatar;
+    async function selectAvatar(avatar) {
+        const success = await updateUserProfileFirebase(gameState.user, { avatar });
+        if (!success) {
+            alert('Не вдалося зберегти аватар');
+            return;
+        }
+
+        gameState.avatar = avatar;
+        updateCachedUser(gameState.user, { avatar });
+        updateHeader();
         closeAvatarModal();
+        showGameNotification('🖼️ Аватар оновлено');
+    }
+
+    async function handleAvatarFileChange(event) {
+        const [file] = event.target.files || [];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            alert('Оберіть файл зображення');
+            event.target.value = '';
+            return;
+        }
+        if (file.size > maxAvatarFileSize) {
+            alert(`Зображення має бути менше ${maxAvatarFileSizeMB} MB`);
+            event.target.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            const avatar = reader.result;
+            const success = await updateUserProfileFirebase(gameState.user, { avatar });
+            if (!success) {
+                alert('Не вдалося зберегти аватар');
+                event.target.value = '';
+                return;
+            }
+
+            gameState.avatar = avatar;
+            updateCachedUser(gameState.user, { avatar });
+            updateHeader();
+            closeAvatarModal();
+            showGameNotification('🖼️ Аватар із галереї збережено');
+            event.target.value = '';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function saveDisplayName() {
+        const displayNameInput = document.getElementById('settings-display-name');
+        const nextDisplayName = displayNameInput.value.trim();
+
+        if (!nextDisplayName) {
+            alert('Введіть імʼя');
+            return;
+        }
+        if (nextDisplayName.length > maxDisplayNameLength) {
+            alert(`Імʼя має бути до ${maxDisplayNameLength} символів`);
+            return;
+        }
+
+        const success = await updateUserProfileFirebase(gameState.user, { displayName: nextDisplayName });
+        if (!success) {
+            alert('Не вдалося зберегти імʼя');
+            return;
+        }
+
+        gameState.displayName = nextDisplayName;
+        updateCachedUser(gameState.user, { displayName: nextDisplayName });
+        updateHeader();
+        updateFriendRequestsList();
+        updateFriendsList();
+        showGameNotification('✅ Імʼя оновлено');
+    }
+
+    async function changePassword() {
+        const currentPassword = document.getElementById('settings-current-password').value;
+        const newPassword = document.getElementById('settings-new-password').value;
+        const confirmPassword = document.getElementById('settings-confirm-password').value;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            alert('Заповніть усі поля пароля');
+            return;
+        }
+        if (newPassword.length < minPasswordLength) {
+            alert(`Новий пароль має містити мінімум ${minPasswordLength} символи`);
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            alert('Нові паролі не співпадають');
+            return;
+        }
+
+        const currentUserData = await loadUserFromFirebase(gameState.user);
+        if (!currentUserData || currentUserData.password !== currentPassword) {
+            alert('Поточний пароль неправильний');
+            return;
+        }
+
+        const success = await updateUserPasswordFirebase(gameState.user, newPassword);
+        if (!success) {
+            alert('Не вдалося оновити пароль');
+            return;
+        }
+
+        document.getElementById('settings-current-password').value = '';
+        document.getElementById('settings-new-password').value = '';
+        document.getElementById('settings-confirm-password').value = '';
+        showGameNotification('🔒 Пароль оновлено');
     }
 
     function closeAvatarModal() {
@@ -682,10 +1096,23 @@
     function logout() {
         removeAllListeners();
         gameState.user = null;
+        gameState.displayName = null;
+        gameState.avatar = avatarGallery[0];
+        gameState.balance = 0;
+        gameState.friends = [];
+        gameState.friendRequests = [];
+        gameState.privateChatMessages = {};
+        gameState.currentChatFriend = null;
+        gameState.expandedFriendRequest = null;
+        allUsers = {};
         document.getElementById('main-scr').style.display = 'none';
         document.getElementById('auth-scr').style.display = 'flex';
         document.getElementById('login-u').value = '';
         document.getElementById('login-p').value = '';
+        document.getElementById('settings-display-name').value = '';
+        document.getElementById('settings-current-password').value = '';
+        document.getElementById('settings-new-password').value = '';
+        document.getElementById('settings-confirm-password').value = '';
     }
 </script>
 
