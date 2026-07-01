@@ -1,34 +1,14 @@
 /**
  * 🔥 FIREBASE REALTIME DATABASE - РЕАЛЬНА СИНХРОНІЗАЦІЯ
  * 
- * Замінює JSONBin на Firebase з миттєвою доставкою:
+ * Використовує Firebase Realtime Database (bb-coin-8ec70) для:
  * - Чати - синхро в реальному часі
  * - Запити на дружбу - миттєвий прихід
  * - Запрошення на гру - блискавичне сповіщення
  * - Передача монет - інстантна
  * 
- * Конфіг Firebase:
- * const firebaseConfig = {
- *   apiKey: "YOUR_API_KEY",
- *   authDomain: "bbcoin-cf933.firebaseapp.com",
- *   databaseURL: "https://bbcoin-cf933-default-rtdb.firebaseio.com",
- *   projectId: "bbcoin-cf933",
- *   storageBucket: "bbcoin-cf933.appspot.com",
- *   messagingSenderId: "YOUR_SENDER_ID",
- *   appId: "YOUR_APP_ID"
- * };
+ * Конфіг завантажується з firebase-config.js (ініціалізується раніше).
  */
-
-// 🔧 FIREBASE КОНФІГ - ВСТАВИТИ ВАШІ ДАНІ
-const firebaseConfig = {
-    apiKey: "AIzaSyD_YOUR_API_KEY_HERE",
-    authDomain: "bbcoin-cf933.firebaseapp.com",
-    databaseURL: "https://bbcoin-cf933-default-rtdb.firebaseio.com",
-    projectId: "bbcoin-cf933",
-    storageBucket: "bbcoin-cf933.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abcdef123456"
-};
 
 let firebaseState = {
     isInitialized: false,
@@ -40,25 +20,25 @@ let firebaseState = {
 
 /**
  * 🚀 ІНІЦІАЛІЗАЦІЯ FIREBASE
+ * Firebase app ініціалізується в firebase-config.js (завантажується раніше).
  */
 function initFirebaseSync() {
     if (firebaseState.isInitialized) return;
     
-    // Завантажити Firebase SDK якщо не завантажено
     if (!window.firebase) {
         console.error('❌ Firebase SDK не завантажено! Додайте скрипти в <head>');
         return;
     }
     
-    // Ініціалізувати Firebase
     if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
+        console.error('❌ Firebase не ініціалізований! Переконайтесь, що firebase-config.js завантажено перед firebase-sync.js');
+        return;
     }
     
     firebaseState.isInitialized = true;
     const db = firebase.database();
     
-    console.log('🔥 Firebase Realtime Database активована');
+    console.log('🔥 Firebase Realtime Database активована (bb-coin-8ec70)');
     console.log('✅ Миттєва синхронізація готова');
     
     return db;
