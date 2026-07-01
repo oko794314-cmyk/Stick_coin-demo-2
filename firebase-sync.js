@@ -143,6 +143,15 @@ function setupChatListener(currentUser, friendUsername) {
     
     const listener = ref.on('value', (snapshot) => {
         const messages = snapshot.val() || [];
+        const realtimeHandler = window.stickChatRealtime && typeof window.stickChatRealtime.handleSnapshot === 'function'
+            ? window.stickChatRealtime.handleSnapshot
+            : (typeof window.handleRealtimeChatSnapshot === 'function' ? window.handleRealtimeChatSnapshot : null);
+
+        if (realtimeHandler) {
+            // Якщо UI зареєстрував власний обробник, передаємо дані й не дублюємо локальний рендер тут.
+            realtimeHandler(friendUsername, messages);
+            return;
+        }
         
         if (gameState.currentChatFriend === friendUsername) {
             gameState.privateChatMessages[friendUsername] = messages;
@@ -155,6 +164,22 @@ function setupChatListener(currentUser, friendUsername) {
     });
     
     firebaseState.chatListeners[chatKey] = listener;
+}
+
+/**
+ * 📥 ЗАВАНТАЖИТИ ПОВІДОМЛЕННЯ ЧАТУ ОДИН РАЗ
+ * Використовується як fallback polling, коли realtime listener недоступний.
+ */
+async function loadChatMessagesFirebase(currentUser, friendUsername) {
+    try {
+        const db = firebase.database();
+        const chatKey = [currentUser, friendUsername].sort().join('_');
+        const snapshot = await db.ref(`chats/${chatKey}/messages`).once('value');
+        return snapshot.val() || [];
+    } catch (error) {
+        console.warn('⚠️ Помилка завантаження повідомлень чату:', error);
+        return [];
+    }
 }
 
 /**
@@ -530,6 +555,7 @@ window.loadUserFromFirebase = loadUserFromFirebase;
 window.loadAllUsersFromFirebase = loadAllUsersFromFirebase;
 window.setupFriendRequestListener = setupFriendRequestListener;
 window.setupChatListener = setupChatListener;
+window.loadChatMessagesFirebase = loadChatMessagesFirebase;
 window.setupGameInvitationListener = setupGameInvitationListener;
 window.sendPrivateMessageFirebase = sendPrivateMessageFirebase;
 window.sendFriendRequestFirebase = sendFriendRequestFirebase;
