@@ -331,7 +331,16 @@ async function rejectFriendRequestFirebase(currentUser, requester) {
 async function updateUserProfileFirebase(username, updates) {
     try {
         const db = firebase.database();
-        await db.ref(`users/${username}`).update(updates);
+        const allowedFields = ['avatar', 'displayName', 'password'];
+        const safeUpdates = Object.fromEntries(
+            Object.entries(updates).filter(([key]) => allowedFields.includes(key))
+        );
+
+        if (Object.keys(safeUpdates).length === 0) {
+            throw new Error('Немає дозволених полів для оновлення');
+        }
+
+        await db.ref(`users/${username}`).update(safeUpdates);
         console.log(`⚙️ Профіль ${username} оновлено`);
         updateSyncIndicator(true);
         return true;

@@ -242,7 +242,7 @@
     <div id="tab5" class="view">
         <h3>⚙️ НАЛАШТУВАННЯ</h3>
         <div class="glass settings-section">
-            <img id="settings-avatar-preview" class="settings-avatar-preview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" alt="avatar preview">
+            <img id="settings-avatar-preview" class="settings-avatar-preview" src="https://api.dicebear.com/7.x/avataaars/svg?seed=default" alt="User profile avatar preview">
             <button class="btn secondary-btn" onclick="openAvatarModal()">ЗМІНИТИ АВАТАР</button>
         </div>
         <div class="glass settings-section">
@@ -425,10 +425,7 @@
         getRouletteSegments: () => rouletteSegments.map(segment => ({ ...segment })),
         normalizeAngle,
         getWheelAngleUnderPointer,
-        getRouletteResultForRotation,
-        getGameState: () => gameState,
-        setGameState: (updates) => Object.assign(gameState, updates),
-        setAllUsers: (users) => { allUsers = users; }
+        getRouletteResultForRotation
     };
 
     // ===== АУТЕНТИФІКАЦІЯ =====
@@ -1001,7 +998,7 @@
             return;
         }
         if (file.size > maxAvatarFileSize) {
-            alert('Зображення має бути менше 2 MB');
+            alert(`Зображення має бути менше ${maxAvatarFileSize / (1024 * 1024)} MB`);
             event.target.value = '';
             return;
         }
@@ -1035,7 +1032,7 @@
             return;
         }
         if (nextDisplayName.length > maxDisplayNameLength) {
-            alert('Імʼя має бути до 24 символів');
+            alert(`Імʼя має бути до ${maxDisplayNameLength} символів`);
             return;
         }
 
@@ -1063,7 +1060,7 @@
             return;
         }
         if (newPassword.length < minPasswordLength) {
-            alert('Новий пароль має містити мінімум 4 символи');
+            alert(`Новий пароль має містити мінімум ${minPasswordLength} символи`);
             return;
         }
         if (newPassword !== confirmPassword) {
@@ -1086,7 +1083,6 @@
         document.getElementById('settings-current-password').value = '';
         document.getElementById('settings-new-password').value = '';
         document.getElementById('settings-confirm-password').value = '';
-        updateCachedUser(gameState.user, { password: newPassword });
         showGameNotification('🔒 Пароль оновлено');
     }
 
