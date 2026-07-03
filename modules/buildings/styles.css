@@ -1,0 +1,51 @@
+/* Buildings Module Styles */
+
+.buildings-module {
+  padding: 20px;
+}
+
+.buildings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.building-card {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-left: 4px solid #ff9800;
+}
+
+.building-card h3 {
+  margin: 0 0 10px 0;
+}
+
+.building-level {
+  color: #ff9800;
+  margin: 5px 0;
+  font-weight: bold;
+}
+
+.building-production {
+  margin: 5px 0 15px 0;
+  color: #666;
+}
+
+.upgrade-btn {
+  width: 100%;
+  padding: 10px;
+  background: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.upgrade-btn:hover {
+  background: #e68900;
+}

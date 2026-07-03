@@ -1,0 +1,32 @@
+/* Economy Module Styles */
+
+.economy-module {
+  padding: 20px;
+}
+
+.economy-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.econ-stat {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.econ-label {
+  margin: 0;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.econ-value {
+  margin: 10px 0 0 0;
+  font-size: 24px;
+  font-weight: bold;
+}

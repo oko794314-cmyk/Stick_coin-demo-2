@@ -1,167 +1,164 @@
-# 🎮 Baby Coin (BBC)
+# Stick Coin Demo - Modular Architecture
 
-Повнофункціональна онлайн гра з монетами, майнінгом, рулеткою та системою друзів!
+## 📋 Overview
 
-## ✨ ОСНОВНІ ФУНКЦІЇ
+Проєкт Stick Coin Demo побудований на 100% модульній архітектурі. Кожна вкладка — окремий модуль з власною логікою, UI та Firebase інтеграцією.
 
-### ⛏️ Майнінг
-- Автоматичний заробіток +0.0001 BBC/сек
-- Збереження прогресу при перезапуску
-- Синхронізація між пристроями
+## 🏗️ Архітектура
 
-### 💳 Трансфери
-- Переводи коштів іншим гравцям
-- Миттєве оновлення балансу
-- Пошук користувачів
+```
+modules/
+├── exchange/        # Обмін криптовалюти
+├── news/           # Новини
+├── mining/         # Майнінг
+├── casino/         # Казино
+├── workshop/       # Крафтинг
+├── marketplace/    # Магазин
+├── profile/        # Профіль користувача
+├── transfers/      # Переводи коїнів
+├── economy/        # Економіка системи
+├── buildings/      # Управління будівлями
+├── rankings/       # Рейтинги гравців
+└── notifications/  # Сповіщення
 
-### 🎰 Казино - Рулетка
-- **RED**: 48% шанс × 2 множник
-- **BLACK**: 24% шанс × 2 множник  
-- **GREEN (0)**: 28% шанс × 14 множник
-- Красива анімація з правильними пропорціями
-
-### 👥 Система Друзів
-- Запити на дружбу з сповіщеннями
-- Список активних друзів
-- Управління контактами
-
-### ⚙️ Конфіг
-- Власний аватар
-- Зміна налаштувань
-- Безпечний вихід
-
----
-
-## 🚀 ВСТАНОВЛЕННЯ
-
-### Варіант 1: GitHub Pages (рекомендовано)
-1. Файл `index.html` автоматично завантажується на GitHub Pages
-2. Відкрийте: `https://oleksandrenkosasa2-coder.github.io/Stick_coin-demo-2/`
-3. Все готово! ✅
-
-### Варіант 2: Локальний запуск
-```bash
-# Просто відкрийте файл в браузері
-open index.html
-# або
-firefox index.html
+core/
+├── StateManager.js     # Глобальне управління станом
+└── ModuleManager.js    # Управління модулями
 ```
 
----
+## 📦 Структура Модуля
 
-## 🔧 ТЕХНІЧНІ ДЕТАЛІ
+Кожен модуль містить:
 
-### Архітектура
-- **Frontend**: Pure HTML5 + CSS + Vanilla JavaScript
-- **База даних**: Firebase Realtime Database (bb-coin-8ec70)
-- **Стилізація**: CSS Grid + Glassmorphism + Gradients
+```
+modules/[module_name]/
+├── index.js       # Основний файл модуля (експорт класу)
+├── ui.js          # UI компоненти
+├── logic.js       # Бізнес-логіка
+├── firebase.js    # Firebase інтеграція
+└── styles.css     # Стилі модуля
+```
 
-### Firebase Інтеграція
-- Збереження та завантаження даних користувачів через Firebase Realtime Database
-- Реал-тайм синхронізація (запити на дружбу, чати, баланс)
-- Fallback polling для чату (кожні ~2.5с), якщо realtime-слухач тимчасово недоступний
-- Резервна копія в localStorage при помилках
+### Приклад структури модуля:
 
-### Запуск
-1. Відкрийте `index.html` у браузері або використовуйте GitHub Pages
-2. Firebase налаштований і підключається автоматично (конфіг у `firebase-config.js`)
-3. Реєструйтесь та грайте!
+**index.js** — Основний клас модуля
+```javascript
+export class ExchangeModule {
+  constructor(stateManager) {
+    this.stateManager = stateManager;
+    this.ui = new ExchangeUI();
+    this.logic = new ExchangeLogic();
+    this.firebase = new ExchangeFirebase();
+  }
 
-### Безпека
-- Firebase Rules обмежують доступ до даних
-- Паролі зберігаються як plain-text (рекомендується хешування для продакшн)
-- CORS-safe запити через Firebase SDK
+  async init() {
+    await this.firebase.init();
+    this.ui.render(document.getElementById('exchange-container'));
+  }
+}
+```
 
----
+**ui.js** — UI компоненти
+```javascript
+export class ExchangeUI {
+  render(container) {
+    // Рендер UI
+  }
+}
+```
 
-## 🎮 ГАЙД КОРИСТУВАЧА
+**logic.js** — Бізнес-логіка
+```javascript
+export class ExchangeLogic {
+  async executeExchange(from, to, amount) {
+    // Логіка обміну
+  }
+}
+```
 
-### Реєстрація
-1. Нажміть "РЕЄСТРАЦІЯ"
-2. Введіть логін та пароль (мін. 1 символ)
-3. Підтвердіть пароль
-4. Готово!
+**firebase.js** — Firebase операції
+```javascript
+export class ExchangeFirebase {
+  async saveBet(bet) {
+    // Збереження в Firebase
+  }
+}
+```
 
-### Вхід
-1. Введіть логін та пароль
-2. Нажміть "УВІЙТИ"
+## 🚀 Правила Розробки
 
-### Майнінг
-1. Перейдіть на вкладку "⛏️ Mining"
-2. Нажміть "START MINING"
-3. Отримуйте +0.0001 STICK/сек
-4. Нажміть знову для зупинки
+### ✅ Дозволено
+- Додавати нові вкладки (модулі)
+- Додавати функції всередину модуля
+- Використовувати API модулів
+- Рефакторити код всередину модуля
 
-### Рулетка
-1. Перейдіть на "🎰 Casino"
-2. Введіть ставку
-3. Виберіть колір (RED/BLACK/GREEN)
-4. Дивіться результат
+### ❌ Заборонено
+- Переписувати весь проєкт
+- Змінювати чужі модулі
+- Переносити логіку між файлами без потреби
+- Ламати сумісність
+- Використовувати глобальні змінні
+- Дублювати код
 
-### Трансфери
-1. Перейдіть на "💳 Transfer"
-2. Введіть логін отримувача
-3. Введіть суму
-4. Нажміть "ВІДПРАВИТИ"
+## 🔌 Взаємодія Модулів
 
-### Друзі
-1. Перейдіть на "👥 Friends"
-2. Введіть логін друга
-3. Нажміть "+ ДОДАТИ"
-4. Друг отримає запит
+Модулі взаємодіють ТІЛЬКИ через:
 
----
+1. **StateManager** — для спільного стану
+```javascript
+this.stateManager.setState('user', userData);
+const user = this.stateManager.getState('user');
+```
 
-## 🐛 ФІКСОВАНІ БАГИ v2.0
+2. **API Модулів** — публічні методи
+```javascript
+const exchangeModule = moduleManager.getModule('exchange');
+await exchangeModule.executeExchange(from, to, amount);
+```
 
-✅ Повна перебудова кода  
-✅ Оптимізація для GitHub Pages  
-✅ Фіксовано кеш-проблеми  
-✅ Рулетка з правильними пропорціями  
-✅ Синхронізація даних між пристроями  
-✅ Прибрані невикористані файли  
+## 🛠️ Як Додати Новий Модуль
 
----
+1. Створити папку `modules/[module_name]/`
+2. Додати файли: `index.js`, `ui.js`, `logic.js`, `firebase.js`, `styles.css`
+3. Імпортувати в `app.js`
+4. Зареєструвати в `ModuleManager`
 
-## 📱 Сумісність
+```javascript
+import { MyModule } from './modules/my_module/index.js';
 
-- ✓ Chrome/Chromium
-- ✓ Firefox
-- ✓ Safari
-- ✓ Edge
-- ✓ Мобільні браузери
+moduleManager.registerModule('mymodule', MyModule);
+```
 
----
+## 📊 State Management
 
-## 📊 Статистика
+### StateManager
+- Централізоване управління станом
+- Підписка на зміни
+- Доступ з будь-якого модуля
 
-- **Розмір**: ~50KB HTML
-- **JavaScript**: ~8KB (Vanilla JS, без бібліотек)
-- **CSS**: ~12KB (Pure CSS3)
-- **Завантаження**: < 1 сек
+```javascript
+// Встановлення стану
+stateManager.setState('gameData', data);
 
----
+// Отримання стану
+const data = stateManager.getState('gameData');
 
-## 🎯 План розвитку
+// Підписка на зміни
+const unsubscribe = stateManager.subscribe((state) => {
+  console.log('Стан змінився:', state);
+});
+```
 
-- [ ] Мультиплеєр чати (реал-тайм)
-- [ ] Турніри рулетки
-- [ ] Достижения та медалі
-- [ ] Лідерборд
-- [ ] PWA підтримка (offline mode)
+## 🎯 Практики
 
----
+- Кожен модуль незалежний
+- Вся логіка в `logic.js`
+- Весь UI в `ui.js`
+- Весь Firebase код в `firebase.js`
+- Спільні данні через StateManager
+- API модулю через публічні методи в `index.js`
 
-## 📞 Контакти
+## 📝 License
 
-**Автор**: oleksandrenkosasa2-coder  
-**GitHub**: https://github.com/oleksandrenkosasa2-coder  
-**Email**: oleksandrenkosasa2@gmail.com
-
----
-
-## 🎉 НАСОЛОДЖУЙТЕСЬ ГРОЮ!
-
-**STICK FARM PRO ULTRA** 🚀✨
-
-Made with ❤️ by oleksandrenkosasa2-coder
+MIT

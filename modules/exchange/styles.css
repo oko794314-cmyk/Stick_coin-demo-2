@@ -1,0 +1,44 @@
+/* Exchange Module Styles */
+
+.exchange-module {
+  padding: 20px;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.exchange-form {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.exchange-select,
+.exchange-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.exchange-button {
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.exchange-button:hover {
+  background: #0056b3;
+}
+
+.exchange-result {
+  margin-top: 20px;
+  padding: 15px;
+  background: white;
+  border-radius: 4px;
+  border-left: 4px solid #28a745;
+}

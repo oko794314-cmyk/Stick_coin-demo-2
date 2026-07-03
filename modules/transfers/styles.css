@@ -1,0 +1,40 @@
+/* Transfers Module Styles */
+
+.transfers-module {
+  padding: 20px;
+}
+
+.transfer-form {
+  display: flex;
+  gap: 10px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+.transfer-input {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  flex: 1;
+  min-width: 150px;
+}
+
+.transfer-button {
+  padding: 10px 30px;
+  background: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+.transfer-button:hover {
+  background: #0b7dda;
+}
+
+.transfer-history {
+  margin-top: 20px;
+}

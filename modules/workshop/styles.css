@@ -1,0 +1,49 @@
+/* Workshop Module Styles */
+
+.workshop-module {
+  padding: 20px;
+}
+
+.crafting-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.craft-item {
+  background: white;
+  padding: 15px;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+  transition: border-color 0.3s;
+}
+
+.craft-item:hover {
+  border-color: #ff9800;
+}
+
+.craft-item h3 {
+  margin: 0 0 10px 0;
+}
+
+.craft-time {
+  color: #ff9800;
+  margin: 5px 0 15px 0;
+  font-size: 14px;
+}
+
+.craft-button {
+  width: 100%;
+  padding: 10px;
+  background: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.craft-button:hover {
+  background: #e68900;
+}
